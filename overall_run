@@ -1,0 +1,33 @@
+# python sciript_name data_sample_name num_structures max_epochs
+
+rm -r ./NN\ results
+rm -r ./pickled\ data
+mkdir ./NN\ results
+mkdir ./NN\ results/all\ data
+mkdir ./NN\ results/high_level\ data
+mkdir ./NN\ results/low_level\ data
+mkdir ./NN\ results/no_D2\ data
+mkdir ./NN\ results/no_jet_mass\ data
+mkdir ./pickled\ data
+
+python create_featuresets.py
+
+python neural_network_3_layer.py all 10 20
+python neural_network_6_layer.py all 10 20
+python neural_network_10_layer.py all 10 20
+
+python neural_network_3_layer.py high_level 10 20
+python neural_network_6_layer.py high_level 10 20
+python neural_network_10_layer.py high_level 10 20
+
+python neural_network_3_layer.py low_level 10 20
+python neural_network_6_layer.py low_level 10 20
+python neural_network_10_layer.py low_level 10 20
+
+python neural_network_3_layer.py no_D2 10 20
+python neural_network_6_layer.py no_D2 10 20
+python neural_network_10_layer.py no_D2 10 20
+
+python neural_network_3_layer.py no_jet_mass 10 20
+python neural_network_6_layer.py no_jet_mass 10 20
+python neural_network_10_layer.py no_jet_mass 10 20
