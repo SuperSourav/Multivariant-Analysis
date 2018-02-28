@@ -9,20 +9,24 @@ import math
 import sys
 
 with open ('./pickled data/%s_train_x' % sys.argv[1], 'rb') as fp:
+    train_x = pickle.load(fp)
+with open ('./pickled data/%s_train_x_with_mass' % sys.argv[1], 'rb') as fp:
     train_x_with_mass = pickle.load(fp)
-    train_x = train_x_with_mass[0:len(train_x_with_mass)][0:len(train_x_with_mass)-1]
 
 with open ('./pickled data/%s_train_y' % sys.argv[1], 'rb') as fp:
-    train_y_with_mass = pickle.load(fp)
-    train_y = train_y_with_mass[0:len(train_y_with_mass)][0:len(train_y_with_mass)-1]
+    train_y = pickle.load(fp)
+with open ('./pickled data/%s_train_y_with_mass' % sys.argv[1], 'rb') as fp:
+    s_train_y_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_test_x' % sys.argv[1], 'rb') as fp:
+    test_x = pickle.load(fp)
+with open ('./pickled data/%s_test_x_with_mass' % sys.argv[1], 'rb') as fp:
     test_x_with_mass = pickle.load(fp)
-    test_x = test_x_with_mass[0:len(test_x_with_mass)][0:len(test_x_with_mass)-1]
 
 with open ('./pickled data/%s_test_y' % sys.argv[1], 'rb') as fp:
+    test_y = pickle.load(fp)
+with open ('./pickled data/%s_test_y_with_mass' % sys.argv[1], 'rb') as fp:
     test_y_with_mass = pickle.load(fp)
-    test_y = test_y_with_mass[0:len(test_y_with_mass)][0:len(test_y_with_mass)-1]
 
 n_classes = 2
 batch_size = 1000

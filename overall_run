@@ -12,22 +12,22 @@ mkdir ./pickled\ data
 
 python create_featuresets.py
 
-python neural_network_3_layer.py all 10 20
-python neural_network_6_layer.py all 10 20
-python neural_network_10_layer.py all 10 20
+python neural_network_3_layer.py all 6 2
+#python neural_network_6_layer.py all 10 20
+#python neural_network_10_layer.py all 10 20
 
-python neural_network_3_layer.py high_level 10 20
-python neural_network_6_layer.py high_level 10 20
-python neural_network_10_layer.py high_level 10 20
+#python neural_network_3_layer.py high_level 10 20
+#python neural_network_6_layer.py high_level 10 20
+#python neural_network_10_layer.py high_level 10 20
 
-python neural_network_3_layer.py low_level 10 20
-python neural_network_6_layer.py low_level 10 20
-python neural_network_10_layer.py low_level 10 20
+#python neural_network_3_layer.py low_level 10 20
+#python neural_network_6_layer.py low_level 10 20
+#python neural_network_10_layer.py low_level 10 20
 
-python neural_network_3_layer.py no_D2 10 20
-python neural_network_6_layer.py no_D2 10 20
-python neural_network_10_layer.py no_D2 10 20
+#python neural_network_3_layer.py no_D2 10 20
+#python neural_network_6_layer.py no_D2 10 20
+#python neural_network_10_layer.py no_D2 10 20
 
-python neural_network_3_layer.py no_jet_mass 10 20
-python neural_network_6_layer.py no_jet_mass 10 20
-python neural_network_10_layer.py no_jet_mass 10 20
+#python neural_network_3_layer.py no_jet_mass 10 20
+#python neural_network_6_layer.py no_jet_mass 10 20
+#python neural_network_10_layer.py no_jet_mass 10 20
