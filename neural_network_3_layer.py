@@ -10,23 +10,15 @@ import sys
 
 with open ('./pickled data/%s_train_x' % sys.argv[1], 'rb') as fp:
     train_x = pickle.load(fp)
-with open ('./pickled data/%s_train_x_with_mass' % sys.argv[1], 'rb') as fp:
-    train_x_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_train_y' % sys.argv[1], 'rb') as fp:
     train_y = pickle.load(fp)
-with open ('./pickled data/%s_train_y_with_mass' % sys.argv[1], 'rb') as fp:
-    s_train_y_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_test_x' % sys.argv[1], 'rb') as fp:
     test_x = pickle.load(fp)
-with open ('./pickled data/%s_test_x_with_mass' % sys.argv[1], 'rb') as fp:
-    test_x_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_test_y' % sys.argv[1], 'rb') as fp:
     test_y = pickle.load(fp)
-with open ('./pickled data/%s_test_y_with_mass' % sys.argv[1], 'rb') as fp:
-    test_y_with_mass = pickle.load(fp)
 
 n_classes = 2
 batch_size = 1000
@@ -71,7 +63,7 @@ def neural_network_model(data, layer_sizes):
 	return output
 
 # Generate the confusion matrix for a binary classifier
-def confusion_matrix(prediction, sample_x, sample_y, sample_x_with_mass, threshold):
+def confusion_matrix(prediction, sample_x, sample_y, threshold):
 	true_signal = 0
 	false_signal = 0
 	false_background = 0
@@ -83,10 +75,10 @@ def confusion_matrix(prediction, sample_x, sample_y, sample_x_with_mass, thresho
 		signal_probability = prediction[i][0]
 		if signal_probability>threshold and sample_y[i][0]==1 :
 			true_signal += 1
-			filtered_mass.append(sample_x_with_mass[i][len(sample_x_with_mass[i])-1])
+			filtered_mass.append(sample_x[i][3])
 		if signal_probability>threshold and sample_y[i][0]==0 :
 			false_signal += 1
-			filtered_mass.append(sample_x_with_mass[i][len(sample_x_with_mass[i])-1])
+			filtered_mass.append(sample_x[i][3])
 		if signal_probability<=threshold and sample_y[i][0]==1 :
 			false_background += 1
 		if signal_probability<=threshold and sample_y[i][0]==0 :
@@ -134,7 +126,7 @@ def train_neural_network(x, layer_sizes):
 		filtered_mass_ret = []
 		
 		while i/divisions <= 1:
-			true_signal, false_signal, false_background, true_background, filtered_mass = confusion_matrix(tf.nn.softmax(prediction).eval(feed_dict = {x:test_x}, session = sess), test_x, test_y, test_x_with_mass,i/divisions)
+			true_signal, false_signal, false_background, true_background, filtered_mass = confusion_matrix(tf.nn.softmax(prediction).eval(feed_dict = {x:test_x}, session = sess), test_x, test_y, i/divisions)
 			filtered_mass_ret.append(filtered_mass)
 			background_rejection = true_background/(true_background+false_signal)
 			signal_efficiency = true_signal/(true_signal+false_background)
@@ -151,64 +143,6 @@ def train_neural_network(x, layer_sizes):
 
 	return roc, -auc, threshold_plot, filtered_mass_ret
 
-def plot_graph(all_nodes, data_sample):
-
-	n = len(all_nodes)
-
-	# bubble sort all nodes
-	for i in range(n):
-		for j in range(0,n-i-1):
-			if all_nodes[j].auc > all_nodes[j+1].auc:
-				all_nodes[j], all_nodes[j+1] = all_nodes[j+1], all_nodes[j]
-
-	plt.figure(1)
-	for i in range(n-1,0,-int(n/5)):
-		roc = all_nodes[i].roc
-		auc = all_nodes[i].auc
-		roc_name = all_nodes[i].name
-		plt.plot(roc[0],roc[1],label="%s, AUC = %f" % (roc_name,auc))
-	plt.xlabel("Signal Efficiency")
-	plt.ylabel("Background Rejection")
-	plt.legend()
-	plt.title("3-layer ROC %s data" % data_sample)
-	plt.savefig("./NN results/%s data/3-layer ROC %s" % (data_sample,data_sample))
-
-	plt.figure(2)
-	for i in range(n-1,0,-int(n/5)):
-		threshold_plot = all_nodes[i].threshold_plot
-		roc_name = all_nodes[i].name
-		plt.plot(threshold_plot[0],threshold_plot[1],label="%s" % (roc_name))
-	plt.xlabel("Probability Threshold")
-	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
-	plt.legend()
-	plt.title("3-layer Probability Threshold %s data" % data_sample)
-	plt.savefig("./NN results/%s data/3-layer Probability Threshold %s" % (data_sample,data_sample))
-
-	plt.figure(3)
-	max_ratio = 0
-	max_index = -1
-	for i in range (len(all_nodes[n-1].threshold_plot[1])):
-		if all_nodes[n-1].threshold_plot[1][i] > max_ratio:
-			max_ratio = all_nodes[n-1].threshold_plot[1][i]
-			max_index = i
-	num_bins = int(len(all_nodes[n-1].filtered_mass[max_index])/100)+1
-	n, bins, patches = plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='blue', alpha=0.5, label="%s" % (roc_name))
-	roc_name = all_nodes[len(all_nodes)-1].name
-	plt.xlabel("Mass of Highest Pt Jet [GeV]")
-	plt.legend()
-	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
-	plt.savefig("./NN results/%s data/3-layer Filtered Jet Mass %s" % (data_sample,data_sample))
-
-	plt.figure(4)
-	num_bins = int(len(test_x_with_mass)/100)+1
-	masses = []
-	for i in range (len(test_x_with_mass)):
-		masses.append(test_x_with_mass[i][len(test_x_with_mass[i])-1])
-	n, bins, patches = plt.hist(masses, num_bins, facecolor='blue', alpha=0.5)
-	plt.xlabel("Mass of Highest Pt Jet [GeV]")
-	plt.title("Unfiltered Jet Mass %s data" % data_sample)
-	plt.savefig("./NN results/Unfiltered Jet Mass %s" % data_sample)
-
 
 def structure_test():
 
@@ -219,7 +153,7 @@ def structure_test():
 		n_nodes_hl2 = random.randint(100,500)
 		n_nodes_hl3 = random.randint(50,300)
 		print()
-		print("Structure",tries,": ", n_nodes_hl1,n_nodes_hl2,n_nodes_hl3)
+		print("Structure",tries+1,": ", n_nodes_hl1,n_nodes_hl2,n_nodes_hl3)
 		roc, auc, threshold_plot, filtered_mass = train_neural_network(x,[n_nodes_hl1,n_nodes_hl2,n_nodes_hl3])
 		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, name = "[%d, %d, %d]" % (n_nodes_hl1,n_nodes_hl2,n_nodes_hl3))
 		all_nodes.append(node)
@@ -228,6 +162,7 @@ def structure_test():
 
 if __name__ == '__main__':
 	all_nodes = structure_test()
-	plot_graph(all_nodes,sys.argv[1])
+	with open('./output data/3-layer %s data' % sys.argv[1], 'wb') as fp:
+		pickle.dump(all_nodes,fp)
 
 
