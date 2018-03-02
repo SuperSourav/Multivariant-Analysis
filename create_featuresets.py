@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from itertools import zip_longest
 
-max_lines = pow(10,3)
+max_lines = pow(10,30)
 num_features = 27
 
 def calculate_features_minmax(signal,background):
@@ -94,7 +94,7 @@ def create_feature_sets_and_labels(signal,background,min_features,max_features,e
 	# print("Normalizing signal")
 	features += sample_handling(signal,min_features,max_features,[1,0],1,exclusions)
 	# print("Normalizing background")
-	features += sample_handling(background,min_features,max_features,[0,1],1/8,exclusions)
+	features += sample_handling(background,min_features,max_features,[0,1],1,exclusions)
 	random.shuffle(features)
 	features = np.array(features)
 
