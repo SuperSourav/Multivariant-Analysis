@@ -8,16 +8,16 @@ import random
 import math
 import sys
 
-with open ('./pickled data/%s_train_x' % sys.argv[1], 'rb') as fp:
+with open ('./input data/%s_train_x' % sys.argv[1], 'rb') as fp:
     train_x = pickle.load(fp)
 
-with open ('./pickled data/%s_train_y' % sys.argv[1], 'rb') as fp:
+with open ('./input data/%s_train_y' % sys.argv[1], 'rb') as fp:
     train_y = pickle.load(fp)
 
-with open ('./pickled data/%s_test_x' % sys.argv[1], 'rb') as fp:
+with open ('./input data/%s_test_x' % sys.argv[1], 'rb') as fp:
     test_x = pickle.load(fp)
 
-with open ('./pickled data/%s_test_y' % sys.argv[1], 'rb') as fp:
+with open ('./input data/%s_test_y' % sys.argv[1], 'rb') as fp:
     test_y = pickle.load(fp)
 
 with open('./input data/max_min_features', 'rb') as fp:
