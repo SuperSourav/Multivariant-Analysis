@@ -77,11 +77,19 @@ def plot_graph(data_sample, num_layers):
 	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
 
 	if num_layers == 3:
+		mass_index = -1
+		if data_sample == "all":
+			mass_index = 3
+		if data_sample == "high_level":
+			mass_index = 0
+		if data_sample == "no_D2":
+			mass_index = 3
+
 		plt.figure(4)
 		num_bins = 1000
 		masses = []
 		for i in range (len(test_x)):
-			masses.append((test_x[i][3]*(max_features[3]-min_features[3])+min_features[3])/1000)
+			masses.append((test_x[i][mass_index]*(max_features[3]-min_features[3])+min_features[3])/1000)
 		plt.hist(masses, num_bins, facecolor='blue', alpha=0.5)
 		plt.xlabel("Mass of Highest Pt Jet [GeV]")
 		plt.title("Unfiltered Jet Mass %s data" % data_sample)
