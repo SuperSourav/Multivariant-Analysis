@@ -1,20 +1,26 @@
 # python sciript_name data_sample_name num_structures max_epochs
 
-rm -r ./NN\ results
-rm -r ./pickled\ data
-mkdir ./NN\ results
-mkdir ./NN\ results/all\ data
-mkdir ./NN\ results/high_level\ data
-mkdir ./NN\ results/low_level\ data
-mkdir ./NN\ results/no_D2\ data
-mkdir ./NN\ results/no_jet_mass\ data
-mkdir ./pickled\ data
+rm -r ./__pycache__
+rm -r ./NN\ results\ visualizations
+rm -r ./input\ data
+rm -r ./output\ data
+mkdir ./output\ data
+mkdir ./input\ data
+mkdir ./NN\ results\ visualizations
+mkdir ./NN\ results\ visualizations/all\ data
+mkdir ./NN\ results\ visualizations/high_level\ data
+mkdir ./NN\ results\ visualizations/low_level\ data
+mkdir ./NN\ results\ visualizations/no_D2\ data
+mkdir ./NN\ results\ visualizations/no_jet_mass\ data
 
 python create_featuresets.py
 
 python neural_network_3_layer.py all 6 2
-#python neural_network_6_layer.py all 10 20
-#python neural_network_10_layer.py all 10 20
+python visualization.py all 3
+python neural_network_6_layer.py all 6 2
+python visualization.py all 6
+python neural_network_10_layer.py all 10 20
+python visualization.py all 10
 
 #python neural_network_3_layer.py high_level 10 20
 #python neural_network_6_layer.py high_level 10 20
