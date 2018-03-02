@@ -20,6 +20,11 @@ with open ('./pickled data/%s_test_x' % sys.argv[1], 'rb') as fp:
 with open ('./pickled data/%s_test_y' % sys.argv[1], 'rb') as fp:
     test_y = pickle.load(fp)
 
+with open('./input data/max_min_features', 'rb') as fp:
+	temp = pickle.load(fp)
+	min_features = temp[0]
+	max_features = temp[1]
+
 n_classes = 2
 batch_size = 1000
 max_epochs = int(sys.argv[3])
@@ -75,10 +80,10 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 		signal_probability = prediction[i][0]
 		if signal_probability>threshold and sample_y[i][0]==1 :
 			true_signal += 1
-			filtered_mass.append(sample_x[i][3])
+			filtered_mass.append((sample_x[i][3]*(max_features[3]-min_features[3])+min_features[3])/1000)
 		if signal_probability>threshold and sample_y[i][0]==0 :
 			false_signal += 1
-			filtered_mass.append(sample_x[i][3])
+			filtered_mass.append((sample_x[i][3]*(max_features[3]-min_features[3])+min_features[3])/1000)
 		if signal_probability<=threshold and sample_y[i][0]==1 :
 			false_background += 1
 		if signal_probability<=threshold and sample_y[i][0]==0 :

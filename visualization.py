@@ -17,11 +17,16 @@ def plot_graph(data_sample, num_layers):
 	if data_sample!="all" and data_sample!="high_level" and data_sample!="low_level" and data_sample!="no_D2" and data_sample!="no_jet_mass":
 		raise Exception('Illegal data_sample input!')
 
-	with open ('./pickled data/%s_test_x' % data_sample, 'rb') as fp:
+	with open ('./input data/%s_test_x' % data_sample, 'rb') as fp:
 	    test_x = pickle.load(fp)
 
 	with open('./output data/%d-layer %s data' % (num_layers,data_sample), 'rb') as fp:
 		all_nodes = pickle.load(fp)
+
+	with open('./input data/max_min_features', 'rb') as fp:
+		temp = pickle.load(fp)
+		min_features = temp[0]
+		max_features = temp[1]
 
 	divisions = 20
 
@@ -66,7 +71,7 @@ def plot_graph(data_sample, num_layers):
 	num_bins = 1000
 	roc_name = all_nodes[n-1].name
 	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='blue', alpha=0.5, label="%s" % (roc_name))
-	plt.xlabel("Normalized Mass of Highest Pt Jet [GeV]")
+	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend()
 	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
 	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
@@ -76,9 +81,9 @@ def plot_graph(data_sample, num_layers):
 		num_bins = 1000
 		masses = []
 		for i in range (len(test_x)):
-			masses.append(test_x[i][3])
+			masses.append((test_x[i][3]*(max_features[3]-min_features[3])+min_features[3])/1000)
 		plt.hist(masses, num_bins, facecolor='blue', alpha=0.5)
-		plt.xlabel("Normalized Mass of Highest Pt Jet [GeV]")
+		plt.xlabel("Mass of Highest Pt Jet [GeV]")
 		plt.title("Unfiltered Jet Mass %s data" % data_sample)
 		plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
 
