@@ -1,4 +1,3 @@
-from create_featuresets import create_feature_sets_and_labels
 from collections import namedtuple
 from neural_network_3_layer import confusion_matrix
 from neural_network_3_layer import train_neural_network
@@ -13,24 +12,21 @@ import sys
 
 with open ('./pickled data/%s_train_x' % sys.argv[1], 'rb') as fp:
     train_x = pickle.load(fp)
-with open ('./pickled data/%s_train_x_with_mass' % sys.argv[1], 'rb') as fp:
-    train_x_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_train_y' % sys.argv[1], 'rb') as fp:
     train_y = pickle.load(fp)
-with open ('./pickled data/%s_train_y_with_mass' % sys.argv[1], 'rb') as fp:
-    s_train_y_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_test_x' % sys.argv[1], 'rb') as fp:
     test_x = pickle.load(fp)
-with open ('./pickled data/%s_test_x_with_mass' % sys.argv[1], 'rb') as fp:
-    test_x_with_mass = pickle.load(fp)
 
 with open ('./pickled data/%s_test_y' % sys.argv[1], 'rb') as fp:
     test_y = pickle.load(fp)
-with open ('./pickled data/%s_test_y_with_mass' % sys.argv[1], 'rb') as fp:
-    test_y_with_mass = pickle.load(fp)
-    
+
+with open('./input data/max_min_features', 'rb') as fp:
+	temp = pickle.load(fp)
+	min_features = temp[0]
+	max_features = temp[1]
+
 n_classes = 2
 batch_size = 1000
 max_epochs = int(sys.argv[3])
@@ -94,54 +90,6 @@ def neural_network_model(data, layer_sizes):
 
 	return output
 
-def plot_graph(all_nodes, data_sample):
-
-	n = len(all_nodes)
-
-	# bubble sort all nodes
-	for i in range(n):
-		for j in range(0,n-i-1):
-			if all_nodes[j].auc > all_nodes[j+1].auc:
-				all_nodes[j], all_nodes[j+1] = all_nodes[j+1], all_nodes[j]
-
-	plt.figure(1)
-	for i in range(n-1,0,-int(n/5)):
-		roc = all_nodes[i].roc
-		auc = all_nodes[i].auc
-		roc_name = all_nodes[i].name
-		plt.plot(roc[0],roc[1],label="%s, AUC = %f" % (roc_name,auc))
-	plt.xlabel("Signal Efficiency")
-	plt.ylabel("Background Rejection")
-	plt.legend()
-	plt.title("6-layer ROC %s data" % data_sample)
-	plt.savefig("./NN results/%s data/6-layer ROC %s" % (data_sample,data_sample))
-
-	plt.figure(2)
-	for i in range(n-1,0,-int(n/5)):
-		threshold_plot = all_nodes[i].threshold_plot
-		roc_name = all_nodes[i].name
-		plt.plot(threshold_plot[0],threshold_plot[1],label="%s" % (roc_name))
-	plt.xlabel("Probability Threshold")
-	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
-	plt.legend()
-	plt.title("6-layer Probability Threshold %s data" % data_sample)
-	plt.savefig("./NN results/%s data/6-layer Probability Threshold %s" % (data_sample,data_sample))
-
-	plt.figure(3)
-	max_ratio = 0
-	max_index = -1
-	for i in range (len(all_nodes[n-1].threshold_plot[1])):
-		if all_nodes[n-1].threshold_plot[1][i] > max_ratio:
-			max_ratio = all_nodes[n-1].threshold_plot[1][i]
-			max_index = i
-	num_bins = int(len(all_nodes[n-1].filtered_mass[max_index])/100)+1
-	n, bins, patches = plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='blue', alpha=0.5, label="%s" % (roc_name))
-	roc_name = all_nodes[len(all_nodes)-1].name
-	plt.xlabel("Mass of Highest Pt Jet [GeV]")
-	plt.legend()
-	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
-	plt.savefig("./NN results/%s data/6-layer Filtered Jet Mass %s" % (data_sample,data_sample))
-
 
 def structure_test():
 
@@ -155,15 +103,15 @@ def structure_test():
 		n_nodes_hl5 = random.randint(500,1000)
 		n_nodes_hl6 = random.randint(50,100)
 		print()
-		print("Structure",tries,": ", n_nodes_hl1,n_nodes_hl2,n_nodes_hl3,n_nodes_hl4,n_nodes_hl5,n_nodes_hl6)
+		print("Structure",tries+1,": ", n_nodes_hl1,n_nodes_hl2,n_nodes_hl3,n_nodes_hl4,n_nodes_hl5,n_nodes_hl6)
 		roc, auc, threshold_plot, filtered_mass = train_neural_network(x,[n_nodes_hl1,n_nodes_hl2,n_nodes_hl3,n_nodes_hl4,n_nodes_hl5,n_nodes_hl6])
 		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, name = "[%d, %d, %d, %d, %d, %d]" % (n_nodes_hl1,n_nodes_hl2,n_nodes_hl3,n_nodes_hl4,n_nodes_hl5,n_nodes_hl6))
 		all_nodes.append(node)
 	return all_nodes
 
-
 if __name__ == '__main__':
 	all_nodes = structure_test()
-	plot_graph(all_nodes,sys.argv[1])
+	with open('./output data/6-layer %s data' % sys.argv[1], 'wb') as fp:
+		pickle.dump(all_nodes,fp)
 
 
