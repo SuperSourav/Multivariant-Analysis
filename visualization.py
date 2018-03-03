@@ -49,6 +49,7 @@ def plot_graph(data_sample, num_layers):
 	plt.legend()
 	plt.title("%d-layer ROC %s data" % (num_layers,data_sample))
 	plt.savefig("./NN results visualizations/%s data/%d-layer ROC" % (data_sample,num_layers))
+	plt.close(1)
 
 	plt.figure(2)
 	for i in range(n-1,0,-int(n/5)):
@@ -60,6 +61,7 @@ def plot_graph(data_sample, num_layers):
 	plt.legend()
 	plt.title("%d-layer Probability Threshold %s data" % (num_layers,data_sample))
 	plt.savefig("./NN results visualizations/%s data/%d-layer Probability Threshold" % (data_sample,num_layers))
+	plt.close(2)
 
 	plt.figure(3)
 	max_ratio = -1
@@ -68,13 +70,14 @@ def plot_graph(data_sample, num_layers):
 		if all_nodes[n-1].threshold_plot[1][i] > max_ratio:
 			max_ratio = all_nodes[n-1].threshold_plot[1][i]
 			max_index = i
-	num_bins = 1000
+	num_bins = 100
 	roc_name = all_nodes[n-1].name
 	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='blue', alpha=0.5, label="%s" % (roc_name))
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend()
 	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
 	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
+	plt.close(3)
 
 	if num_layers == 3:
 		mass_index = -1
@@ -86,7 +89,7 @@ def plot_graph(data_sample, num_layers):
 			mass_index = 3
 
 		plt.figure(4)
-		num_bins = 1000
+		num_bins = 100
 		masses = []
 		for i in range (len(test_x)):
 			masses.append((test_x[i][mass_index]*(max_features[3]-min_features[3])+min_features[3])/1000)
@@ -94,7 +97,11 @@ def plot_graph(data_sample, num_layers):
 		plt.xlabel("Mass of Highest Pt Jet [GeV]")
 		plt.title("Unfiltered Jet Mass %s data" % data_sample)
 		plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
+		plt.close(4)
 
-plot_graph(sys.argv[1],int(sys.argv[2]))
+# plot_graph(sys.argv[1],int(sys.argv[2]))
+for data_sample in ["all","high_level","no_D2"]:
+	for num_layers in [3,6,10]:
+		plot_graph(data_sample,num_layers)
 
 
