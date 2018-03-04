@@ -9,9 +9,9 @@ import sys
 import os
 import glob
 
-MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass name")
+MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
 
-def plot_graph(data_sample, num_layers):
+def plot_graph(data_sample, num_layers, unfiltered_plotted):
 
 	if data_sample!="all" and data_sample!="high_level" and data_sample!="low_level" and data_sample!="no_D2" and data_sample!="no_jet_mass":
 		raise Exception('Illegal data_sample input!')
@@ -71,7 +71,6 @@ def plot_graph(data_sample, num_layers):
 	if data_sample == "no_D2":
 		mass_index = 3
 
-	plt.figure(4)
 	num_bins = 100
 	for i in range (len(test_x)):
 		masses.append((test_x[i][mass_index]*(max_features[3]-min_features[3])+min_features[3])/1000)
@@ -83,7 +82,6 @@ def plot_graph(data_sample, num_layers):
 		if all_nodes[n-1].threshold_plot[1][i] > max_ratio:
 			max_ratio = all_nodes[n-1].threshold_plot[1][i]
 			max_index = i
-	num_bins = 100
 	roc_name = all_nodes[n-1].name
 	plt.hist(masses, num_bins, facecolor='green', alpha=0.2, label = "Unfiltered", normed = True)
 	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='red', alpha=1, label="%s Filtered" % roc_name, normed = True)
@@ -93,21 +91,36 @@ def plot_graph(data_sample, num_layers):
 	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
 	plt.close(3)
 
-	if num_layers == 3:
+	if unfiltered_plotted == False:
+		plt.figure(4)
 		plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = True)
 		plt.xlabel("Mass of Highest Pt Jet [GeV]")
 		plt.title("Unfiltered Jet Mass %s data" % data_sample)
 		plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
 		plt.close(4)
+		unfiltered_plotted = True
+
+	plt.figure(5)
+	plt.plot(all_nodes[n-1].epoch_losses,label="%s" % roc_name)
+	plt.xlabel("Epochs")
+	plt.ylabel("Loss")
+	plt.legend()
+	plt.title("%d-layer Loss %s data" % (num_layers,data_sample))
+	plt.savefig("./NN results visualizations/%s data/%d-layer Loss" % (data_sample,num_layers))
+	plt.close(5)
+
 
 # plot_graph(sys.argv[1],int(sys.argv[2]))
-path = './output data'
+if __name__ == '__main__':
+	path = './output data'
+	unfiltered_plotted = False
 
-for filename in glob.glob(os.path.join(path, '* data')):
-    # do your stuff
-    filename = re.split("/",filename)[2]
-    num_layers = re.split("-",filename)[0]
-    data_sample = re.split(" ",filename)[1]
-    plot_graph(data_sample, int(num_layers))
+	for filename in glob.glob(os.path.join(path, '* data')):
+	    # do your stuff
+	    filename = re.split("/",filename)[2]
+	    num_layers = re.split("-",filename)[0]
+	    data_sample = re.split(" ",filename)[1]
+	    plot_graph(data_sample, int(num_layers),unfiltered_plotted)
+	    unfiltered_plotted = True
 
 

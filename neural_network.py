@@ -33,7 +33,7 @@ divisions = 20
 
 x = tf.placeholder('float',[None, len(train_x[0])])	
 y = tf.placeholder('float',[None, len(train_y[0])])
-MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass name")
+MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
 
 def neural_network_model(data, layer_sizes):
 
@@ -96,12 +96,11 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 
 def train_neural_network(x, layer_sizes):
 
-	# print("train_x sample : ",train_x[0])
-	# print("test_x sample : ",test_x[0])
-
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
 	optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
+
+	epoch_losses = []
 
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
@@ -120,6 +119,7 @@ def train_neural_network(x, layer_sizes):
 				epoch_loss += c
 				i+=batch_size
 				
+			epoch_losses.append(epoch_loss)
 			# print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
 		
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
@@ -148,7 +148,7 @@ def train_neural_network(x, layer_sizes):
 	print("Background Rejection: ", roc[1])
 	auc = np.trapz(roc[1],roc[0])
 
-	return roc, -auc, threshold_plot, filtered_mass_ret
+	return roc, -auc, threshold_plot, filtered_mass_ret, epoch_losses
 
 
 def structure_test():
@@ -167,8 +167,8 @@ def structure_test():
 			n_nodes.append(random.randint(a,b))
 		print()
 		print("Structure",tries+1,": ", n_nodes)
-		roc, auc, threshold_plot, filtered_mass = train_neural_network(x,n_nodes)
-		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, name = "[%s]" % n_nodes)
+		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes)
+		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, epoch_losses = epoch_losses, name = "[%s]" % n_nodes)
 		all_nodes.append(node)
 	return all_nodes
 
