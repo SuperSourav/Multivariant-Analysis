@@ -96,9 +96,19 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 
 def train_neural_network(x, layer_sizes):
 
+	starter_learning_rate=0.001
+	global_step=tf.Variable(0,trainable=False)
+
+	# #We want to decrease the learning rate after having seen all the data 5 times
+	NUM_EPOCHS_PER_DECAY=5
+	LEARNING_RATE_DECAY_FACTOR=0.1
+	num_batches_per_epoch=int(len(train_x)/float(batch_size))
+	decay_steps=int(num_batches_per_epoch*NUM_EPOCHS_PER_DECAY)
+	decayed_learning_rate=tf.train.exponential_decay(starter_learning_rate, global_step, decay_steps, LEARNING_RATE_DECAY_FACTOR,staircase=True)
+
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
-	optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
+	optimizer = tf.train.AdamOptimizer(learning_rate=decayed_learning_rate).minimize(cost,global_step = global_step)
 
 	epoch_losses = []
 
@@ -120,7 +130,7 @@ def train_neural_network(x, layer_sizes):
 				i+=batch_size
 				
 			epoch_losses.append(epoch_loss)
-			# print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
+			print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
 		
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
