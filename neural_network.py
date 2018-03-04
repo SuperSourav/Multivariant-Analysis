@@ -1,4 +1,5 @@
 from collections import namedtuple
+from scipy.stats import norm
 import tensorflow as tf
 import pickle
 import re
@@ -157,7 +158,13 @@ def structure_test():
 	for tries in range (int(sys.argv[2])):
 		n_nodes = []
 		for i in range (int(sys.argv[4])):
-			n_nodes.append(random.randint(50*i+1,100*(i+1)))
+			# Number of nodes in each layer follow normal distribution(num_layers/2, num_layers/4)
+			# scaled up to the highes point being num_layers*100
+			# And is taken as a random integer between pdf at i and pdf at i / 4
+			scaling = int(sys.argv[4])*100/norm.pdf(norm.ppf(0.5, loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4),loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4)
+			b = int(scaling*norm.pdf(i,loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4))
+			a = int(b/4)
+			n_nodes.append(random.randint(a,b))
 		print()
 		print("Structure",tries+1,": ", n_nodes)
 		roc, auc, threshold_plot, filtered_mass = train_neural_network(x,n_nodes)
@@ -167,6 +174,11 @@ def structure_test():
 
 
 if __name__ == '__main__':
+	if sys.argv[1] != "all" and sys.argv[1] != "high_level" and sys.argv[1] != "no_D2":
+		raise Exception('Illegal data_sample input!')
+	if int(sys.argv[4]) > 10:
+		raise Exception('Neural net is too deep!')
+
 	all_nodes = structure_test()
 	with open('./output data/%d-layer %s data' % (int(sys.argv[4]),sys.argv[1]), 'wb') as fp:
 		pickle.dump(all_nodes,fp)

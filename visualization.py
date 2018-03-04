@@ -6,13 +6,12 @@ import matplotlib.pyplot as plt
 import random
 import math
 import sys
+import os
+import glob
 
 MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass name")
 
 def plot_graph(data_sample, num_layers):
-
-	if num_layers!=3 and num_layers!=6 and num_layers!=10:
-		raise Exception('Illegal num_layers input!')
 
 	if data_sample!="all" and data_sample!="high_level" and data_sample!="low_level" and data_sample!="no_D2" and data_sample!="no_jet_mass":
 		raise Exception('Illegal data_sample input!')
@@ -86,8 +85,8 @@ def plot_graph(data_sample, num_layers):
 			max_index = i
 	num_bins = 100
 	roc_name = all_nodes[n-1].name
-	plt.hist(masses, num_bins, facecolor='blue', alpha=0.1, label = "Unfiltered", normed = True)
-	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='red', alpha=1, label="%s Filtered" % (roc_name), normed = True)
+	plt.hist(masses, num_bins, facecolor='green', alpha=0.2, label = "Unfiltered", normed = True)
+	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='red', alpha=1, label="%s Filtered" % roc_name, normed = True)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
 	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
@@ -102,8 +101,13 @@ def plot_graph(data_sample, num_layers):
 		plt.close(4)
 
 # plot_graph(sys.argv[1],int(sys.argv[2]))
-for data_sample in ["all","high_level","no_D2"]:
-	for num_layers in [3,6,10]:
-		plot_graph(data_sample,num_layers)
+path = './output data'
+
+for filename in glob.glob(os.path.join(path, '* data')):
+    # do your stuff
+    filename = re.split("/",filename)[2]
+    num_layers = re.split("-",filename)[0]
+    data_sample = re.split(" ",filename)[1]
+    plot_graph(data_sample, int(num_layers))
 
 
