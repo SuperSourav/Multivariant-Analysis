@@ -27,7 +27,7 @@ with open('./input data/max_min_features', 'rb') as fp:
 	max_features = temp[1]
 
 n_classes = 2
-batch_size = 1000
+batch_size = 100
 max_epochs = int(sys.argv[3])
 divisions = 20
 
