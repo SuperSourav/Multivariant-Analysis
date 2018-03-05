@@ -1,6 +1,6 @@
 from collections import namedtuple
 from scipy.stats import norm
-from dynamic_learning_rate import dynamic_learning_rate
+import dynamic_learning_rate
 import tensorflow as tf
 import pickle
 import re
@@ -100,24 +100,29 @@ def train_neural_network(x, layer_sizes):
 	global_step=tf.Variable(0,trainable=False)
 
 	# #We want to decrease the learning rate after having seen all the data 5 times
-	learning_rate = dynamic_learning_rate(train_x, batch_size, global_step)
+	learning_rate = dynamic_learning_rate.SGDR_decay_lr(train_x, batch_size, global_step)
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
 	optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost,global_step = global_step)
 
+	config = tf.ConfigProto(intra_op_parallelism_threads=256, inter_op_parallelism_threads=256, allow_soft_placement=True, device_count = {'CPU': 8})
+
 	epoch_losses = []
 
 	lr_val = []
 
-	with tf.Session() as sess:
+	with tf.Session(config = config) as sess:
 		sess.run(tf.global_variables_initializer())
 
 		epoch = 0
 		
 		while (True):
+			if (epoch+1>max_epochs):
+				break
 			epoch_loss = 0
 			i=0
+			# print("global_step = ", tf.train.global_step(sess, global_step))
 			while i < len(train_x):
 				start = i
 				end = i+batch_size
@@ -134,19 +139,17 @@ def train_neural_network(x, layer_sizes):
 			epoch_losses.append(epoch_loss)
 
 			print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
-			if (epoch!=0 and abs(epoch_loss-epoch_losses[epoch-1])/epoch_losses[epoch-1]<0.0001):
-				break
-			if (epoch>max_epochs):
+			if (epoch!=0 and abs(epoch_loss-epoch_losses[epoch-1])/epoch_losses[epoch-1]<0.001):
 				break
 			epoch += 1
 		
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
-		plt.figure()
-		plt.plot(lr_val,"-b")
-		plt.title("Evolution of learning rate" )
-		plt.show()
+		# plt.figure()
+		# plt.plot(lr_val,"-b")
+		# plt.title("Evolution of learning rate" )
+		# plt.show()
 
 		print('Test Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 
