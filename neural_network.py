@@ -1,5 +1,6 @@
 from collections import namedtuple
 from scipy.stats import norm
+from dynamic_learning_rate import dynamic_learning_rate
 import tensorflow as tf
 import pickle
 import re
@@ -27,8 +28,8 @@ with open('./input data/max_min_features', 'rb') as fp:
 	max_features = temp[1]
 
 n_classes = 2
-batch_size = 100
-max_epochs = int(sys.argv[3])
+batch_size = 1000
+max_epochs = 50
 divisions = 20
 
 x = tf.placeholder('float',[None, len(train_x[0])])	
@@ -96,26 +97,25 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 
 def train_neural_network(x, layer_sizes):
 
-	starter_learning_rate=0.001
 	global_step=tf.Variable(0,trainable=False)
 
 	# #We want to decrease the learning rate after having seen all the data 5 times
-	NUM_EPOCHS_PER_DECAY=5
-	LEARNING_RATE_DECAY_FACTOR=0.1
-	num_batches_per_epoch=int(len(train_x)/float(batch_size))
-	decay_steps=int(num_batches_per_epoch*NUM_EPOCHS_PER_DECAY)
-	decayed_learning_rate=tf.train.exponential_decay(starter_learning_rate, global_step, decay_steps, LEARNING_RATE_DECAY_FACTOR,staircase=True)
+	learning_rate = dynamic_learning_rate(train_x, batch_size, global_step)
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
-	optimizer = tf.train.AdamOptimizer(learning_rate=decayed_learning_rate).minimize(cost,global_step = global_step)
+	optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost,global_step = global_step)
 
 	epoch_losses = []
 
+	lr_val = []
+
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
+
+		epoch = 0
 		
-		for epoch in range(max_epochs):
+		while (True):
 			epoch_loss = 0
 			i=0
 			while i < len(train_x):
@@ -128,12 +128,25 @@ def train_neural_network(x, layer_sizes):
 															  y: batch_y})
 				epoch_loss += c
 				i+=batch_size
+
+				lr_val.append([sess.run(learning_rate)])
 				
 			epoch_losses.append(epoch_loss)
+
 			print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
+			if (epoch!=0 and abs(epoch_loss-epoch_losses[epoch-1])/epoch_losses[epoch-1]<0.0001):
+				break
+			if (epoch>max_epochs):
+				break
+			epoch += 1
 		
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
+
+		plt.figure()
+		plt.plot(lr_val,"-b")
+		plt.title("Evolution of learning rate" )
+		plt.show()
 
 		print('Test Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 
@@ -165,14 +178,16 @@ def structure_test():
 
 	all_nodes = []
 
+	num_layers = int(sys.argv[3])
+
 	for tries in range (int(sys.argv[2])):
 		n_nodes = []
-		for i in range (int(sys.argv[4])):
+		for i in range (num_layers):
 			# Number of nodes in each layer follow normal distribution(num_layers/2, num_layers/4)
 			# scaled up to the highes point being num_layers*100
 			# And is taken as a random integer between pdf at i and pdf at i / 4
-			scaling = int(sys.argv[4])*100/norm.pdf(norm.ppf(0.5, loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4),loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4)
-			b = int(scaling*norm.pdf(i,loc = int(sys.argv[4])/2, scale = int(sys.argv[4])/4))
+			scaling = num_layers*100/norm.pdf(norm.ppf(0.5, loc = num_layers/2, scale = num_layers/4),loc = num_layers/2, scale = num_layers/4)
+			b = int(scaling*norm.pdf(i,loc = num_layers/2, scale = num_layers/4))
 			a = int(b/4)
 			n_nodes.append(random.randint(a,b))
 		print()
@@ -186,11 +201,11 @@ def structure_test():
 if __name__ == '__main__':
 	if sys.argv[1] != "all" and sys.argv[1] != "high_level" and sys.argv[1] != "no_D2":
 		raise Exception('Illegal data_sample input!')
-	if int(sys.argv[4]) > 10:
+	if int(sys.argv[3]) > 10:
 		raise Exception('Neural net is too deep!')
 
 	all_nodes = structure_test()
-	with open('./output data/%d-layer %s data' % (int(sys.argv[4]),sys.argv[1]), 'wb') as fp:
+	with open('./output data/%d-layer %s data' % (int(sys.argv[3]),sys.argv[1]), 'wb') as fp:
 		pickle.dump(all_nodes,fp)
 
 

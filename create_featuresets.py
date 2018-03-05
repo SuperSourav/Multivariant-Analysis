@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from itertools import zip_longest
 
-max_lines = pow(10,3)
+max_lines = pow(10,4)
 num_features = 27
 
 def calculate_features_minmax(signal,background):

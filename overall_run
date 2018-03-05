@@ -1,4 +1,4 @@
-# python sciript_name data_sample_name num_structures max_epochs num_layers
+# python sciript_name data_sample_name num_structures num_layers
 
 rm -r ./__pycache__
 rm -r ./NN\ results\ visualizations
@@ -15,9 +15,9 @@ mkdir ./NN\ results\ visualizations/no_jet_mass\ data
 
 python create_featuresets.py
 
-python neural_network.py all 6 20 2
-#python neural_network_2.py all 6 5 2
-#python neural_network.py all 6 1 3
-#python neural_network.py all 6 1 7
+python neural_network.py all 6 2
+#python neural_network_2.py all 6 2
+#python neural_network.py all 6 3
+#python neural_network.py all 6 7
 
 python visualization.py
