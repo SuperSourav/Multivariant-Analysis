@@ -251,6 +251,8 @@ EL::StatusCode MyxAODAnalysis :: execute ()
         // exit(0);
     }
 
+    // D2 = ECF3*pow(ECF1,3.0)/pow(ECF2,3.0)
+
     // Jet 1
     float D2_1 = -10000;
     float subjets_1 = -5;
@@ -263,7 +265,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=1){
     	if((*aux_jets_itr_1)->auxdata<float>("ECF2") != 0){
-    		D2_1 = TMath::Power(10,20)*(*aux_jets_itr_1)->auxdata<float>("ECF3")/pow((*aux_jets_itr_1)->auxdata<float>("ECF2"),3);
+    		D2_1 = TMath::Power(10,20)*(*aux_jets_itr_1)->auxdata<float>("ECF3");
+    		D2_1 = D2_1*pow((*aux_jets_itr_1)->auxdata<float>("ECF1"),3);
+    		D2_1 = D2_1/pow((*aux_jets_itr_1)->auxdata<float>("ECF2"),3);
     	}
     	subjets_1 = (float) (*aux_jets_itr_1)->auxdata<int>("NTrimSubjets");
     	ECF2_1 = (*aux_jets_itr_1)->auxdata<float>("ECF2");
@@ -291,7 +295,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=2){
     	if((*aux_jets_itr_2)->auxdata<float>("ECF2") != 0){
-    		D2_2 = TMath::Power(10,20)*(*aux_jets_itr_2)->auxdata<float>("ECF3")/pow((*aux_jets_itr_2)->auxdata<float>("ECF2"),3);
+    		D2_2 = TMath::Power(10,20)*(*aux_jets_itr_2)->auxdata<float>("ECF3");
+    		D2_2 = D2_2*pow((*aux_jets_itr_2)->auxdata<float>("ECF1"),3);
+    		D2_2 = D2_2/pow((*aux_jets_itr_2)->auxdata<float>("ECF2"),3);
     	}
     	subjets_2 = (float) (*aux_jets_itr_2)->auxdata<int>("NTrimSubjets");
     	ECF2_2 = (*aux_jets_itr_2)->auxdata<float>("ECF2");
@@ -319,7 +325,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=3){
     	if((*aux_jets_itr_3)->auxdata<float>("ECF2") != 0){
-    		D2_3 = TMath::Power(10,20)*(*aux_jets_itr_3)->auxdata<float>("ECF3")/pow((*aux_jets_itr_3)->auxdata<float>("ECF2"),3);
+    		D2_3 = TMath::Power(10,20)*(*aux_jets_itr_3)->auxdata<float>("ECF3");
+    		D2_3 = D2_3*pow((*aux_jets_itr_3)->auxdata<float>("ECF1"),3);
+    		D2_3 = D2_3/pow((*aux_jets_itr_3)->auxdata<float>("ECF2"),3);
     	}
     	subjets_3 = (float) (*aux_jets_itr_3)->auxdata<int>("NTrimSubjets");
     	ECF2_3 = (*aux_jets_itr_3)->auxdata<float>("ECF2");
@@ -334,6 +342,9 @@ EL::StatusCode MyxAODAnalysis :: execute ()
             printf("Event %d filled fake jet 3\n",total_eventCounter);
         }
     }
+
+    if(pt_photon.Pt()/1000>250 && pt_photon.Eta()<1.37 && pt_1/1000>200 && eta_1<2 && TMath::Abs(m_1/1000-80.385)<15){
+    	// baseline cuts
 
     fprintf(background,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
         pt_1,eta_1,phi_1,m_1,D2_1,subjets_1,
@@ -378,6 +389,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     h25->Fill(ECF3_3);
     h26->Fill(D2_3);
     h27->Fill(subjets_3);
+}
 
     if(jet_counter<3 && total_eventCounter<=500){
         printf("Highest Pt jets are:\n (%f, %f, %f, %f, %f, %f)\n(%f, %f, %f, %f, %f, %f)\n(%f, %f, %f, %f, %f, %f)\n",
