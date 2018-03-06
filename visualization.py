@@ -11,7 +11,7 @@ import glob
 
 MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
 
-def plot_graph(data_sample, num_layers, unfiltered_plotted):
+def plot_graph(data_sample, num_layers):
 
 	if data_sample!="all" and data_sample!="high_level" and data_sample!="low_level" and data_sample!="no_D2" and data_sample!="no_jet_mass":
 		raise Exception('Illegal data_sample input!')
@@ -83,22 +83,20 @@ def plot_graph(data_sample, num_layers, unfiltered_plotted):
 			max_ratio = all_nodes[n-1].threshold_plot[1][i]
 			max_index = i
 	roc_name = all_nodes[n-1].name
-	plt.hist(masses, num_bins, facecolor='green', alpha=0.2, label = "Unfiltered", normed = True)
-	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, facecolor='red', alpha=1, label="%s Filtered" % roc_name, normed = True)
+	plt.hist(masses, num_bins, histtype='step', label = "Unfiltered", stacked = True, normed = True)
+	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, normed = True)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
 	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
 	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
 	plt.close(3)
 
-	if unfiltered_plotted == False:
-		plt.figure(4)
-		plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = True)
-		plt.xlabel("Mass of Highest Pt Jet [GeV]")
-		plt.title("Unfiltered Jet Mass %s data" % data_sample)
-		plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
-		plt.close(4)
-		unfiltered_plotted = True
+	plt.figure(4)
+	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = True)
+	plt.xlabel("Mass of Highest Pt Jet [GeV]")
+	plt.title("Unfiltered Jet Mass %s data" % data_sample)
+	plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
+	plt.close(4)
 
 	plt.figure(5)
 	plt.plot(all_nodes[n-1].epoch_losses,label="%s" % roc_name)
@@ -113,14 +111,12 @@ def plot_graph(data_sample, num_layers, unfiltered_plotted):
 # plot_graph(sys.argv[1],int(sys.argv[2]))
 if __name__ == '__main__':
 	path = './output data'
-	unfiltered_plotted = False
 
 	for filename in glob.glob(os.path.join(path, '* data')):
 	    # do your stuff
 	    filename = re.split("/",filename)[2]
 	    num_layers = re.split("-",filename)[0]
 	    data_sample = re.split(" ",filename)[1]
-	    plot_graph(data_sample, int(num_layers),unfiltered_plotted)
-	    unfiltered_plotted = True
+	    plot_graph(data_sample, int(num_layers))
 
 
