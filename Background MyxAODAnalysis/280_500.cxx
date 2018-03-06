@@ -343,7 +343,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
         }
     }
 
-    if(pt_photon.Pt()/1000>250 && pt_photon.Eta()<1.37 && pt_1>200 && eta_1<2 && TMath::Abs(m_1/1000-80.385)<15){
+    if(pt_photon.Pt()/1000>250 && pt_photon.Eta()<1.37 && pt_1>200 && eta_1<2){
     	// baseline cuts
 
     fprintf(background,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
