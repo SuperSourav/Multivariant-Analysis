@@ -1,7 +1,6 @@
 from collections import namedtuple
 from scipy.stats import norm
 import dynamic_learning_rate
-import learning_schedules
 import tensorflow as tf
 import pickle
 import re
@@ -100,7 +99,9 @@ def train_neural_network(x, layer_sizes):
 
 	global_step=tf.Variable(0,trainable=False)
 
-	learning_rate = dynamic_learning_rate.SGDR_decay_lr(train_x = train_x, batch_size = batch_size, global_step = global_step)
+	learning_rate = dynamic_learning_rate.triangular_lr(train_x = train_x, 
+		batch_size = batch_size, 
+		global_step = global_step)
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )

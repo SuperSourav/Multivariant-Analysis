@@ -1,9 +1,10 @@
 import tensorflow as tf
 import numpy as np
+import math
 
 def exponential_decay_lr(train_x, batch_size, global_step):
 	starter_learning_rate=0.001
-	#We want to decrease the learning rate after having seen all the data 5 times
+	#We want to decrease the learning rate after having seen all the data 1 times
 	NUM_EPOCHS_PER_DECAY=1
 	LEARNING_RATE_DECAY_FACTOR=0.1
 	num_batches_per_epoch=int(len(train_x)/float(batch_size))
@@ -42,3 +43,38 @@ def SGDR_decay_lr(train_x, batch_size, global_step,
 			learning_rate)
 
 	return learning_rate
+
+def triangular_lr(train_x, batch_size, global_step):
+	# Reference: https://mp.weixin.qq.com/s/QoTYg4qkiQDWQbfyy78JCg
+	NUM_EPOCHS_PER_DECAY=1
+	num_batches_per_epoch=int(len(train_x)/float(batch_size))
+	half_period =int(num_batches_per_epoch*NUM_EPOCHS_PER_DECAY)
+
+	print("half_period = ",half_period)
+
+	max_lr = 0.001
+	min_lr = max_lr/100
+
+	slope = 1/half_period
+
+	phase = np.remainder(tf.cast(global_step, tf.float32),2*half_period)
+	perturbation = tf.where(phase<half_period, slope * phase, 1-slope*(phase-half_period))
+
+	learning_rate = min_lr + (max_lr-min_lr) * perturbation
+
+	return learning_rate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
