@@ -95,13 +95,18 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 
 	return true_signal, false_signal, false_background, true_background, filtered_mass
 
-def train_neural_network(x, layer_sizes):
+def train_neural_network(x, layer_sizes, lr_model):
 
 	global_step=tf.Variable(0,trainable=False)
 
-	learning_rate = dynamic_learning_rate.triangular_lr(train_x = train_x, 
-		batch_size = batch_size, 
-		global_step = global_step)
+	exponential_decay_lr = dynamic_learning_rate.exponential_decay_lr(train_x, batch_size, global_step)
+
+	triangular_lr = dynamic_learning_rate.triangular_lr(train_x, batch_size, global_step)
+
+	SGDR_decay_lr = dynamic_learning_rate.SGDR_decay_lr(train_x, batch_size, global_step)
+
+	learning_rate = tf.where(lr_model == "exp", exponential_decay_lr, 
+		tf.where(lr_model == "triangular", triangular_lr, SGDR_decay_lr))
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
@@ -196,7 +201,7 @@ def structure_test():
 			n_nodes.append(random.randint(a,b))
 		print()
 		print("Structure",tries+1,": ", n_nodes)
-		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes)
+		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes, sys.argv[4])
 		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, epoch_losses = epoch_losses, name = "[%s]" % n_nodes)
 		all_nodes.append(node)
 	return all_nodes
