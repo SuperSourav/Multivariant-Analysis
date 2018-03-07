@@ -11,7 +11,7 @@ import glob
 
 MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
 
-def plot_graph(data_sample, num_layers):
+def plot_graph(data_sample, num_layers, lr_model):
 
 	if data_sample!="all" and data_sample!="high_level" and data_sample!="low_level" and data_sample!="no_D2" and data_sample!="no_jet_mass":
 		raise Exception('Illegal data_sample input!')
@@ -19,7 +19,7 @@ def plot_graph(data_sample, num_layers):
 	with open ('./input data/%s_test_x' % data_sample, 'rb') as fp:
 	    test_x = pickle.load(fp)
 
-	with open('./output data/%d-layer %s data' % (num_layers,data_sample), 'rb') as fp:
+	with open('./output data/%d-layer %s data %s_lr' % (num_layers,data_sample, lr_model), 'rb') as fp:
 		all_nodes = pickle.load(fp)
 
 	with open('./input data/max_min_features', 'rb') as fp:
@@ -46,8 +46,8 @@ def plot_graph(data_sample, num_layers):
 	plt.xlabel("Signal Efficiency")
 	plt.ylabel("Background Rejection")
 	plt.legend()
-	plt.title("%d-layer ROC %s data" % (num_layers,data_sample))
-	plt.savefig("./NN results visualizations/%s data/%d-layer ROC" % (data_sample,num_layers))
+	plt.title("%d-layer ROC %s data %s_lr" % (num_layers,data_sample,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer ROC %s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(1)
 
 	plt.figure(2)
@@ -58,8 +58,8 @@ def plot_graph(data_sample, num_layers):
 	plt.xlabel("Probability Threshold")
 	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
 	plt.legend()
-	plt.title("%d-layer Probability Threshold %s data" % (num_layers,data_sample))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Probability Threshold" % (data_sample,num_layers))
+	plt.title("%d-layer Probability Threshold %s data %s_lr" % (num_layers,data_sample,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer Probability Threshold %s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(2)
 
 	masses = []
@@ -87,8 +87,8 @@ def plot_graph(data_sample, num_layers):
 	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, normed = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
-	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass" % (data_sample,num_layers))
+	plt.title("Filtered Jet Mass %s data, Threshold = %f, %s_lr" % (data_sample, max_index/divisions,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass %s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(3)
 
 	plt.figure(4)
@@ -103,8 +103,8 @@ def plot_graph(data_sample, num_layers):
 	plt.xlabel("Epochs")
 	plt.ylabel("Loss")
 	plt.legend()
-	plt.title("%d-layer Loss %s data" % (num_layers,data_sample))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Loss" % (data_sample,num_layers))
+	plt.title("%d-layer Loss %s data %s_lr" % (num_layers,data_sample,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer Loss %s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(5)
 
 
@@ -113,11 +113,16 @@ if __name__ == '__main__':
 
 	path = './output data'
 
-	for filename in glob.glob(os.path.join(path, '* data')):
+	for filename in glob.glob(os.path.join(path, '*lr')):
 	    # do your stuff
+	    # print("filename = ", filename)
 	    filename = re.split("/",filename)[2]
 	    num_layers = re.split("-",filename)[0]
+	    # print("num_layers = ", num_layers)
 	    data_sample = re.split(" ",filename)[1]
-	    plot_graph(data_sample, int(num_layers))
+	    # print("data_sample = ", data_sample)
+	    lr_model = re.split("_",re.split(" ",filename)[3])[0]
+	    # print("lr_model = ", lr_model)
+	    plot_graph(data_sample, int(num_layers),lr_model)
 
 

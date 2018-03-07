@@ -110,7 +110,7 @@ def train_neural_network(x, layer_sizes, lr_model):
 			tf.where(lr_model == "sgdr", SGDR_decay_lr, 0.001)))
 
 	prediction = neural_network_model(x,layer_sizes)
-	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
+	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits_v2(logits=prediction,labels=y) )
 	optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost,global_step = global_step)
 
 	config = tf.ConfigProto(intra_op_parallelism_threads=64, inter_op_parallelism_threads=64, allow_soft_placement=True, device_count = {'CPU': 8})
@@ -217,7 +217,7 @@ if __name__ == '__main__':
 		raise Exception('Neural net is too deep!')
 
 	all_nodes = structure_test()
-	with open('./output data/%d-layer %s data' % (int(sys.argv[3]),sys.argv[1]), 'wb') as fp:
+	with open('./output data/%d-layer %s data %s_lr' % (int(sys.argv[3]),sys.argv[1],sys.argv[4]), 'wb') as fp:
 		pickle.dump(all_nodes,fp)
 
 
