@@ -76,7 +76,7 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
 	h7 = new TH1F("h7", "Jet Mass of Highest Pt Jet", 100, -11*TMath::Power(10,3), 400000);
     h8 = new TH1F("h8", "ECF2 of Highest Pt Jet",100,-6*TMath::Power(10,9),80*TMath::Power(10,9));
     h9 = new TH1F("h9", "ECF3 of Highest Pt Jet",100,-60*TMath::Power(10,12),300*TMath::Power(10,12));
-    h10 = new TH1F("h10", "D2 of Highest Pt Jet",100,-15000,80*TMath::Power(10,3));
+    h10 = new TH1F("h10", "D2 of Highest Pt Jet",100,-1,5);
     h11 = new TH1I("h11", "Number of Jets in Highest Pt Jet",21,-6,15);
 
 	h12 = new TH1F("h12", "Pt of Second Highest Pt Jet",100,-150,1500);
@@ -85,7 +85,7 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
 	h15 = new TH1F("h15", "Jet Mass of Second Highest Pt Jet", 100, -11*TMath::Power(10,3), 200*TMath::Power(10,3));
     h16 = new TH1F("h16", "ECF2 of Second Highest Pt Jet",100,-6*TMath::Power(10,9),20*TMath::Power(10,9));
     h17 = new TH1F("h17", "ECF3 of Second Highest Pt Jet",100,-60*TMath::Power(10,12),150*TMath::Power(10,12));
-    h18 = new TH1F("h18", "D2 of Second Highest Pt Jet",100,-15000,400*TMath::Power(10,3));
+    h18 = new TH1F("h18", "D2 of Second Highest Pt Jet",100,-1,5);
     h19 = new TH1I("h19", "Number of Jets in Second Highest Pt Jet",21,-6,15);
 
     h20 = new TH1F("h20", "Pt of Third Highest Pt Jet",100,-150,400);
@@ -94,7 +94,7 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
     h23 = new TH1F("h23", "Jet Mass of Third Highest Pt Jet", 100, -11*TMath::Power(10,3), 100*TMath::Power(10,3));
     h24 = new TH1F("h24", "ECF2 of Third Highest Pt Jet",100,-6*TMath::Power(10,9),10*TMath::Power(10,9));
     h25 = new TH1F("h25", "ECF3 of Third Highest Pt Jet",100,-60*TMath::Power(10,12),100*TMath::Power(10,12));
-    h26 = new TH1F("h26", "D2 of Third Highest Pt Jet",100,-15000,400*TMath::Power(10,3));
+    h26 = new TH1F("h26", "D2 of Third Highest Pt Jet",100,-1,5);
     h27 = new TH1I("h27", "Number of Jets in Third Highest Pt Jet",21,-6,15);
 
 	wk()->addOutput (h0);
@@ -254,7 +254,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     // D2 = ECF3*pow(ECF1,3.0)/pow(ECF2,3.0)
 
     // Jet 1
-    float D2_1 = -10000;
+    float D2_1 = -1;
     float subjets_1 = -5;
     float ECF2_1 = -5*TMath::Power(10,9);
     float ECF3_1 = -50*TMath::Power(10,12);
@@ -265,7 +265,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=1){
     	if((*aux_jets_itr_1)->auxdata<float>("ECF2") != 0){
-    		D2_1 = TMath::Power(10,20)*(*aux_jets_itr_1)->auxdata<float>("ECF3");
+    		D2_1 = (*aux_jets_itr_1)->auxdata<float>("ECF3");
     		D2_1 = D2_1*pow((*aux_jets_itr_1)->auxdata<float>("ECF1"),3);
     		D2_1 = D2_1/pow((*aux_jets_itr_1)->auxdata<float>("ECF2"),3);
     	}
@@ -284,7 +284,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     }
 
     // Jet 2
-    float D2_2 = -10000;
+    float D2_2 = -1;
     float subjets_2 = -5;
     float ECF2_2 = -5*TMath::Power(10,9);
     float ECF3_2 = -50*TMath::Power(10,12);
@@ -295,7 +295,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=2){
     	if((*aux_jets_itr_2)->auxdata<float>("ECF2") != 0){
-    		D2_2 = TMath::Power(10,20)*(*aux_jets_itr_2)->auxdata<float>("ECF3");
+    		D2_2 = (*aux_jets_itr_2)->auxdata<float>("ECF3");
     		D2_2 = D2_2*pow((*aux_jets_itr_2)->auxdata<float>("ECF1"),3);
     		D2_2 = D2_2/pow((*aux_jets_itr_2)->auxdata<float>("ECF2"),3);
     	}
@@ -314,7 +314,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     }
 
     // Jet 3
-    float D2_3 = -10000;
+    float D2_3 = -1;
     float subjets_3 = -5;
     float ECF2_3 = -5*TMath::Power(10,9);
     float ECF3_3 = -50*TMath::Power(10,12);
@@ -325,7 +325,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
 
     if(jet_counter>=3){
     	if((*aux_jets_itr_3)->auxdata<float>("ECF2") != 0){
-    		D2_3 = TMath::Power(10,20)*(*aux_jets_itr_3)->auxdata<float>("ECF3");
+    		D2_3 = (*aux_jets_itr_3)->auxdata<float>("ECF3");
     		D2_3 = D2_3*pow((*aux_jets_itr_3)->auxdata<float>("ECF1"),3);
     		D2_3 = D2_3/pow((*aux_jets_itr_3)->auxdata<float>("ECF2"),3);
     	}

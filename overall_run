@@ -1,4 +1,4 @@
-# python sciript_name data_sample_name num_structures num_layers
+# python sciript_name data_sample_name num_structures num_layers lr_model
 
 rm -r ./__pycache__
 rm -r ./NN\ results\ visualizations
@@ -13,11 +13,30 @@ mkdir ./NN\ results\ visualizations/low_level\ data
 mkdir ./NN\ results\ visualizations/no_D2\ data
 mkdir ./NN\ results\ visualizations/no_jet_mass\ data
 
-python create_featuresets.py
+python3 create_featuresets.py
 
-python neural_network.py all 6 2
-#python neural_network_2.py all 6 2
-#python neural_network.py all 6 3
-#python neural_network.py all 6 7
+python3 neural_network.py all 6 3 exp
+python3 neural_network.py all 6 3 triangular
+python3 neural_network.py all 6 3 SGDR
 
-python visualization.py
+python3 neural_network.py all 6 5 exp
+python3 neural_network.py all 6 5 triangular
+python3 neural_network.py all 6 5 SGDR
+
+python3 neural_network.py high_level 6 3 exp
+python3 neural_network.py high_level 6 3 triangular
+python3 neural_network.py high_level 6 3 SGDR
+
+python3 neural_network.py high_level 6 5 exp
+python3 neural_network.py high_level 6 5 triangular
+python3 neural_network.py high_level 6 5 SGDR
+
+python3 neural_network.py no_D2 6 3 exp
+python3 neural_network.py no_D2 6 3 triangular
+python3 neural_network.py no_D2 6 3 SGDR
+
+python3 neural_network.py no_D2 6 5 exp
+python3 neural_network.py no_D2 6 5 triangular
+python3 neural_network.py no_D2 6 5 SGDR
+
+python3 visualization.py

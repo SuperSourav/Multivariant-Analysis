@@ -106,7 +106,8 @@ def train_neural_network(x, layer_sizes, lr_model):
 	SGDR_decay_lr = dynamic_learning_rate.SGDR_decay_lr(train_x, batch_size, global_step)
 
 	learning_rate = tf.where(lr_model == "exp", exponential_decay_lr, 
-		tf.where(lr_model == "triangular", triangular_lr, SGDR_decay_lr))
+		tf.where(lr_model == "triangular", triangular_lr, 
+			tf.where(lr_model == "sgdr", SGDR_decay_lr, 0.001)))
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=prediction,labels=y) )
@@ -152,10 +153,12 @@ def train_neural_network(x, layer_sizes, lr_model):
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
-		plt.figure()
-		plt.plot(lr_val,"-b")
-		plt.title("Evolution of learning rate" )
-		plt.show()
+		# plt.figure()
+		# plt.plot(lr_val,"-b")
+		# plt.xlabel("Global Step")
+		# plt.ylabel("Learning Rate")
+		# plt.title("Evolution of learning rate" )
+		# plt.show()
 
 		print('Test Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 

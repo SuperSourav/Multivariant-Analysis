@@ -50,7 +50,7 @@ def triangular_lr(train_x, batch_size, global_step):
 	num_batches_per_epoch=int(len(train_x)/float(batch_size))
 	half_period =int(num_batches_per_epoch*NUM_EPOCHS_PER_DECAY)
 
-	print("half_period = ",half_period)
+	# print("half_period = ",half_period)
 
 	max_lr = 0.001
 	min_lr = max_lr/100

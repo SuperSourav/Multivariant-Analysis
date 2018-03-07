@@ -83,8 +83,8 @@ def plot_graph(data_sample, num_layers):
 			max_ratio = all_nodes[n-1].threshold_plot[1][i]
 			max_index = i
 	roc_name = all_nodes[n-1].name
-	plt.hist(masses, num_bins, histtype='step', label = "Unfiltered", stacked = True, normed = True)
-	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, normed = True)
+	plt.hist(masses, num_bins, histtype='step', label = "Unfiltered", stacked = True, normed = 1)
+	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, normed = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
 	plt.title("Filtered Jet Mass %s data, Threshold = %f" % (data_sample, max_index/divisions))
@@ -92,7 +92,7 @@ def plot_graph(data_sample, num_layers):
 	plt.close(3)
 
 	plt.figure(4)
-	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = True)
+	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.title("Unfiltered Jet Mass %s data" % data_sample)
 	plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
@@ -110,6 +110,7 @@ def plot_graph(data_sample, num_layers):
 
 # plot_graph(sys.argv[1],int(sys.argv[2]))
 if __name__ == '__main__':
+
 	path = './output data'
 
 	for filename in glob.glob(os.path.join(path, '* data')):
