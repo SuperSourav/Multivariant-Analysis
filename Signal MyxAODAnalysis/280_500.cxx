@@ -182,6 +182,8 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     ANA_CHECK(event->retrieve(eventInfo, "EventInfo"));
 
 	// Find truth level W boson
+    const xAOD::TruthParticleContainer* truthParticle = 0;
+    int pid;
     ANA_CHECK( event->retrieve(truthParticle, "TruthParticles") );
     xAOD::TruthParticleContainer::const_iterator truthParticle_itr = truthParticle->begin();
     xAOD::TruthParticleContainer::const_iterator truthParticle_end = truthParticle->end();
@@ -193,6 +195,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     	if(pid == 24 || pid == -24){
     		w_pt =  (*truthParticle_itr)->p4().Pt();
     		w_counter++;
+            break;
     	}
     }
 
@@ -201,6 +204,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     	exit(0);
     }
 
+    h28->Fill(w_pt/1000);
 
     // Find highest Pt photon
     float photon_highest_pt = 0;

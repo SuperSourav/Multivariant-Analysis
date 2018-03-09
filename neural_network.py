@@ -105,9 +105,12 @@ def train_neural_network(x, layer_sizes, lr_model):
 
 	SGDR_decay_lr = dynamic_learning_rate.SGDR_decay_lr(train_x, batch_size, global_step)
 
+	staircase_decay_lr = dynamic_learning_rate.staircase_decay_lr(train_x, batch_size, global_step)
+
 	learning_rate = tf.where(lr_model == "exp", exponential_decay_lr, 
 		tf.where(lr_model == "triangular", triangular_lr, 
-			tf.where(lr_model == "sgdr", SGDR_decay_lr, 0.001)))
+			tf.where(lr_model == "sgdr", SGDR_decay_lr, 
+				tf.where(lr_model == "staircase", staircase_decay_lr, float(lr_model)))))
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits_v2(logits=prediction,labels=y) )
@@ -153,12 +156,12 @@ def train_neural_network(x, layer_sizes, lr_model):
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
-		# plt.figure()
-		# plt.plot(lr_val,"-b")
-		# plt.xlabel("Global Step")
-		# plt.ylabel("Learning Rate")
-		# plt.title("Evolution of learning rate" )
-		# plt.show()
+		plt.figure()
+		plt.plot(lr_val,"-b")
+		plt.xlabel("Global Step")
+		plt.ylabel("Learning Rate")
+		plt.title("Evolution of learning rate" )
+		plt.show()
 
 		print('Test Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 
@@ -217,7 +220,7 @@ if __name__ == '__main__':
 		raise Exception('Neural net is too deep!')
 
 	all_nodes = structure_test()
-	with open('./output data/%d-layer %s data %s_lr' % (int(sys.argv[3]),sys.argv[1],sys.argv[4]), 'wb') as fp:
+	with open('./output_data/%d-layer %s data %s_lr' % (int(sys.argv[3]),sys.argv[1],sys.argv[4]), 'wb') as fp:
 		pickle.dump(all_nodes,fp)
 
 

@@ -47,7 +47,7 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel("Background Rejection")
 	plt.legend()
 	plt.title("%d-layer ROC %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer ROC %s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer_ROC_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(1)
 
 	plt.figure(2)
@@ -59,7 +59,7 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
 	plt.legend()
 	plt.title("%d-layer Probability Threshold %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Probability Threshold %s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer_Probability_Threshold %s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(2)
 
 	masses = []
@@ -83,19 +83,19 @@ def plot_graph(data_sample, num_layers, lr_model):
 			max_ratio = all_nodes[n-1].threshold_plot[1][i]
 			max_index = i
 	roc_name = all_nodes[n-1].name
-	plt.hist(masses, num_bins, histtype='step', label = "Unfiltered", stacked = True, normed = 1)
-	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, normed = 1)
+	plt.hist(masses, num_bins, histtype='step', label = "Unfiltered", stacked = True, density = 1)
+	plt.hist(all_nodes[n-1].filtered_mass[max_index], num_bins, histtype='step', label="%s Filtered" % roc_name, stacked = True, density = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
 	plt.title("Filtered Jet Mass %s data, Threshold = %f, %s_lr" % (data_sample, max_index/divisions,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Filtered Jet Mass %s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer_Filtered_Jet_Mass_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(3)
 
 	plt.figure(4)
-	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, normed = 1)
+	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, density = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.title("Unfiltered Jet Mass %s data" % data_sample)
-	plt.savefig("./NN results visualizations/Unfiltered Jet Mass %s" % data_sample)
+	plt.savefig("./NN results visualizations/Unfiltered_Jet_Mass_%s" % data_sample)
 	plt.close(4)
 
 	plt.figure(5)
@@ -104,14 +104,14 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel("Loss")
 	plt.legend()
 	plt.title("%d-layer Loss %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer Loss %s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer_Loss_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(5)
 
 
 # plot_graph(sys.argv[1],int(sys.argv[2]))
 if __name__ == '__main__':
 
-	path = './output data'
+	path = './output_data'
 
 	for filename in glob.glob(os.path.join(path, '*lr')):
 	    # do your stuff

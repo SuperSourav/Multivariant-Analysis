@@ -3,8 +3,8 @@
 rm -r ./__pycache__
 rm -r ./NN\ results\ visualizations
 rm -r ./input\ data
-rm -r ./output\ data
-mkdir ./output\ data
+rm -r ./output_data
+mkdir ./output_data
 mkdir ./input\ data
 mkdir ./NN\ results\ visualizations
 mkdir ./NN\ results\ visualizations/all\ data
@@ -18,25 +18,37 @@ python3 create_featuresets.py
 python3 neural_network.py all 6 3 exp
 python3 neural_network.py all 6 3 triangular
 python3 neural_network.py all 6 3 SGDR
+python3 neural_network.py all 6 3 staircase
+python3 neural_network.py all 6 3 0.001
 
 python3 neural_network.py all 6 5 exp
 python3 neural_network.py all 6 5 triangular
 python3 neural_network.py all 6 5 SGDR
+python3 neural_network.py all 6 5 staircase
+python3 neural_network.py all 6 5 0.001
 
 python3 neural_network.py high_level 6 3 exp
 python3 neural_network.py high_level 6 3 triangular
 python3 neural_network.py high_level 6 3 SGDR
+python3 neural_network.py high_level 6 3 staircase
+python3 neural_network.py high_level 6 3 0.001
 
 python3 neural_network.py high_level 6 5 exp
 python3 neural_network.py high_level 6 5 triangular
 python3 neural_network.py high_level 6 5 SGDR
+python3 neural_network.py high_level 6 5 staircase
+python3 neural_network.py high_level 6 5 0.001
 
 python3 neural_network.py no_D2 6 3 exp
 python3 neural_network.py no_D2 6 3 triangular
 python3 neural_network.py no_D2 6 3 SGDR
+python3 neural_network.py no_D2 6 3 staircase
+python3 neural_network.py no_D2 6 3 0.001
 
 python3 neural_network.py no_D2 6 5 exp
 python3 neural_network.py no_D2 6 5 triangular
 python3 neural_network.py no_D2 6 5 SGDR
+python3 neural_network.py no_D2 6 5 staircase
+python3 neural_network.py no_D2 6 5 0.001
 
 python3 visualization.py
