@@ -27,6 +27,8 @@ python3 neural_network.py all 6 5 SGDR
 python3 neural_network.py all 6 5 staircase
 python3 neural_network.py all 6 5 0.001
 
+python3 neural_network.py all 6 10 SGDR
+
 python3 neural_network.py high_level 6 3 exp
 python3 neural_network.py high_level 6 3 triangular
 python3 neural_network.py high_level 6 3 SGDR
@@ -39,6 +41,8 @@ python3 neural_network.py high_level 6 5 SGDR
 python3 neural_network.py high_level 6 5 staircase
 python3 neural_network.py high_level 6 5 0.001
 
+python3 neural_network.py high_level 6 10 SGDR
+
 python3 neural_network.py no_D2 6 3 exp
 python3 neural_network.py no_D2 6 3 triangular
 python3 neural_network.py no_D2 6 3 SGDR
@@ -50,5 +54,7 @@ python3 neural_network.py no_D2 6 5 triangular
 python3 neural_network.py no_D2 6 5 SGDR
 python3 neural_network.py no_D2 6 5 staircase
 python3 neural_network.py no_D2 6 5 0.001
+
+python3 neural_network.py no_D2 6 10 SGDR
 
 python3 visualization.py
