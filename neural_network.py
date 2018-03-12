@@ -37,7 +37,7 @@ y = tf.placeholder('float',[None, len(train_y[0])])
 MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
 
 def neural_network_model(data, layer_sizes):
-
+	
 	# Starting layer
 	hidden_layers = []
 	layers = []
@@ -56,7 +56,12 @@ def neural_network_model(data, layer_sizes):
 					  'weight':tf.Variable(tf.random_normal([layer_sizes[i-1], layer_sizes[i]])),
 					  'bias':tf.Variable(tf.random_normal([layer_sizes[i]]))}
 		hidden_layers.append(hidden_layer)
-		layer = tf.add(tf.matmul(layers[i-1],hidden_layers[i]['weight']), hidden_layers[i]['bias'])
+		# layer = tf.add(tf.matmul(layers[i-1],hidden_layers[i]['weight']), hidden_layers[i]['bias'])
+		layer = tf.matmul(layers[i-1],hidden_layers[i]['weight'])
+		batch_mean, batch_var = tf.nn.moments(layer,[0])
+		scale = tf.Variable(tf.ones([layer_sizes[i]]))
+		beta = tf.Variable(tf.zeros([layer_sizes[i]]))
+		layer = tf.nn.batch_normalization(layer,batch_mean,batch_var,beta,scale,1e-3)
 		layer = tf.nn.sigmoid(layer)
 		layers.append(layer)
 
@@ -110,7 +115,7 @@ def train_neural_network(x, layer_sizes, lr_model):
 	learning_rate = tf.where(lr_model == "exp", exponential_decay_lr, 
 		tf.where(lr_model == "triangular", triangular_lr, 
 			tf.where(lr_model == "sgdr", SGDR_decay_lr, 
-				tf.where(lr_model == "staircase", staircase_decay_lr, float(lr_model)))))
+				tf.where(lr_model == "staircase", staircase_decay_lr, 0.001))))
 
 	prediction = neural_network_model(x,layer_sizes)
 	cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits_v2(logits=prediction,labels=y) )
@@ -149,19 +154,24 @@ def train_neural_network(x, layer_sizes, lr_model):
 			epoch_losses.append(epoch_loss)
 
 			print('Epoch', epoch+1, 'completed out of',max_epochs,'loss:',epoch_loss)
-			if (epoch!=0 and abs(epoch_loss-epoch_losses[epoch-1])/epoch_losses[epoch-1]<1/100):
-				break
+			if (epoch>=5):
+				previous_epoch_loss_average = 0
+				for j in range(5):
+					previous_epoch_loss_average += epoch_losses[epoch-j-1]
+				previous_epoch_loss_average = previous_epoch_loss_average/5
+				if (abs(epoch_loss-previous_epoch_loss_average)/previous_epoch_loss_average<1/100):
+					break
 			epoch += 1
 		
 		correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
-		plt.figure()
-		plt.plot(lr_val,"-b")
-		plt.xlabel("Global Step")
-		plt.ylabel("Learning Rate")
-		plt.title("Evolution of learning rate" )
-		plt.show()
+		# plt.figure()
+		# plt.plot(lr_val,"-b")
+		# plt.xlabel("Global Step")
+		# plt.ylabel("Learning Rate")
+		# plt.title("Evolution of learning rate" )
+		# plt.show()
 
 		print('Test Accuracy:',accuracy.eval({x:test_x, y:test_y}))
 
@@ -195,18 +205,19 @@ def structure_test():
 
 	num_layers = int(sys.argv[3])
 
+	max_num_of_nodes = len(train_x)/12/(n_classes+len(train_x[0]))
+	sigma = num_layers/2.2
+
 	for tries in range (int(sys.argv[2])):
 		n_nodes = []
 		for i in range (num_layers):
-			# Number of nodes in each layer follow normal distribution(num_layers/2, num_layers/4)
-			# scaled up to the highes point being num_layers*100
-			# And is taken as a random integer between pdf at i and pdf at i / 4
-			scaling = num_layers*100/norm.pdf(norm.ppf(0.5, loc = num_layers/2, scale = num_layers/4),loc = num_layers/2, scale = num_layers/4)
-			b = int(scaling*norm.pdf(i,loc = num_layers/2, scale = num_layers/4))
-			a = int(b/4)
-			n_nodes.append(random.randint(a,b))
+			scaling = max_num_of_nodes/norm.pdf(0,loc = 0, scale = sigma)
+			upper = int(norm.pdf(i+1,loc = 1, scale = sigma)*scaling)
+			lower = int(upper*2/3)
+			# print("upper = ", upper, "lower = ",lower)
+			n_nodes.append(random.randint(lower,upper))
 		print()
-		print("Structure",tries+1,": ", n_nodes)
+		print("Structure",tries+1,": ", n_nodes, sys.argv[4], " learning rate")
 		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes, sys.argv[4])
 		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, epoch_losses = epoch_losses, name = "[%s]" % n_nodes)
 		all_nodes.append(node)
@@ -219,7 +230,10 @@ if __name__ == '__main__':
 	if int(sys.argv[3]) > 10:
 		raise Exception('Neural net is too deep!')
 
+	print("Size of training sample = ",len(train_x))
 	all_nodes = structure_test()
+	
+
 	with open('./output_data/%d-layer %s data %s_lr' % (int(sys.argv[3]),sys.argv[1],sys.argv[4]), 'wb') as fp:
 		pickle.dump(all_nodes,fp)
 
