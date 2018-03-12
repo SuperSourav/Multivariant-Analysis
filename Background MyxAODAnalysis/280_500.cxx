@@ -97,8 +97,6 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
     h26 = new TH1F("h26", "D2 of Third Highest Pt Jet",100,-1,5);
     h27 = new TH1I("h27", "Number of Jets in Third Highest Pt Jet",21,-6,15);
 
-    h28 = new TH1F("h28", "Truth Level W Pt",100,0,500);
-
 	wk()->addOutput (h0);
     wk()->addOutput (h1);
     wk()->addOutput (h2);
@@ -127,7 +125,6 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
     wk()->addOutput (h25);
     wk()->addOutput (h26);
     wk()->addOutput (h27);
-    wk()->addOutput (h28);
 
 	return EL::StatusCode::SUCCESS;
 }
@@ -166,8 +163,8 @@ EL::StatusCode MyxAODAnalysis :: initialize ()
     xAOD::TEvent* event = wk()->xaodEvent();
     
     total_eventCounter = 0;
-    //background = fopen("./280_500background.txt", "a");
-    signal = fopen("./280_500signal.txt", "a");
+    background = fopen("./280_500background.txt", "a");
+    // signal = fopen("./280_500signal.txt", "a");
     return EL::StatusCode::SUCCESS;
 }
 
@@ -180,31 +177,6 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     xAOD::TEvent* event = wk()->xaodEvent();
     const xAOD::EventInfo* eventInfo = 0;
     ANA_CHECK(event->retrieve(eventInfo, "EventInfo"));
-
-	// Find truth level W boson
-    const xAOD::TruthParticleContainer* truthParticle = 0;
-    int pid;
-    ANA_CHECK( event->retrieve(truthParticle, "TruthParticles") );
-    xAOD::TruthParticleContainer::const_iterator truthParticle_itr = truthParticle->begin();
-    xAOD::TruthParticleContainer::const_iterator truthParticle_end = truthParticle->end();
-    float w_pt;
-    int w_counter = 0;
-
-    for(;truthParticle_itr!=truthParticle_end;++truthParticle_itr){
-    	pid = (*truthParticle_itr)->pdgId();
-    	if(pid == 24 || pid == -24){
-    		w_pt =  (*truthParticle_itr)->p4().Pt();
-    		w_counter++;
-            break;
-    	}
-    }
-
-    if(w_counter == 0){
-    	printf("No W found\n");
-    	exit(0);
-    }
-
-    h28->Fill(w_pt/1000);
 
     // Find highest Pt photon
     float photon_highest_pt = 0;
