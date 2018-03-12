@@ -6,12 +6,16 @@ from collections import Counter
 from itertools import zip_longest
 
 max_lines = pow(10,30)
-num_features = 27
+num_features = 21
 
 def calculate_features_minmax(signal,background):
 
-	min_features = [float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),float("inf")]
-	max_features = [-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf"),-float("inf")]
+	min_features = np.zeros(num_features)
+	max_features = np.zeros(num_features)
+	for i in range(num_features):
+		min_features[i] = float("inf")
+		max_features[i] = -float("inf")
+
 	lines_count = 0
 
 	print("Calculating features min_max")
@@ -34,6 +38,9 @@ def calculate_features_minmax(signal,background):
 		contents = f.readlines()
 		for l in contents[:max_lines]:
 			lines_count+=1
+			if len(list(map(float,re.findall("[-+]?\d+\.\d+",l))))<num_features:
+				print(l)
+				raise Exception('Illegal background!')
 			for i in range (0,num_features):
 				if list(map(float,re.findall("[-+]?\d+\.\d+",l)))[i] < min_features[i]:
 					min_features[i] = list(map(float,re.findall("[-+]?\d+\.\d+",l)))[i]
@@ -94,7 +101,7 @@ def create_feature_sets_and_labels(signal,background,min_features,max_features,e
 	# print("Normalizing signal")
 	features += sample_handling(signal,min_features,max_features,[1,0],1,exclusions)
 	# print("Normalizing background")
-	features += sample_handling(background,min_features,max_features,[0,1],1/3,exclusions)
+	features += sample_handling(background,min_features,max_features,[0,1],2/3,exclusions)
 	random.shuffle(features)
 	features = np.array(features)
 
@@ -123,7 +130,7 @@ if __name__ == '__main__':
 
 
 	print("\nCreating low level data")
-	exclusions = [3,4,5,9,10,11,15,16,17,21,22,23,24,25,26]
+	exclusions = [3,4,5,9,10,11,15,16,17]
 	low_level_train_x, low_level_train_y,low_level_test_x,low_level_test_y = create_feature_sets_and_labels('./280_500signal.txt','./280_500background.txt',min_features,max_features,exclusions)
 	with open('./input data/low_level_train_x', 'wb') as fp:
 		pickle.dump(low_level_train_x,fp)
