@@ -370,15 +370,14 @@ EL::StatusCode MyxAODAnalysis :: execute ()
         }
     }
 
-    if(pt_photon.Pt()/1000>250 && pt_photon.Eta()<1.37 && pt_1>200 && eta_1<2 && w_pt/1000>150){
+    if(pt_photon.Pt()/1000>250 && TMath::Abs(pt_photon.Eta())<1.37 && pt_1>200 && TMath::Abs(eta_1)<2 && w_pt/1000>150){
     	// baseline cuts
 
-    fprintf(signal,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+    fprintf(signal,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
         pt_1,eta_1,phi_1,m_1,D2_1,subjets_1,
         pt_2,eta_2,phi_2,m_2,D2_2,subjets_2,
         pt_3,eta_3,phi_3,m_3,D2_3,subjets_3,
-        pt_photon.Pt()/1000,pt_photon.Eta(),pt_photon.Phi(),
-        ECF2_1,ECF3_1,ECF2_2,ECF3_2,ECF2_3,ECF3_3,eventInfo->mcEventWeight()
+        pt_photon.Pt()/1000,pt_photon.Eta(),pt_photon.Phi()
         );
     // fprintf(background,"%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f\n",
     //     (*aux_jets_itr_1)->p4().Pt()/1000,(*aux_jets_itr_1)->p4().Eta(),(*aux_jets_itr_1)->p4().Phi(),(*aux_jets_itr_1)->p4().M(),D2_1,(*aux_jets_itr_1)->auxdata<int>("NTrimSubjets"),

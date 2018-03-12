@@ -97,6 +97,8 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
     h26 = new TH1F("h26", "D2 of Third Highest Pt Jet",100,-1,5);
     h27 = new TH1I("h27", "Number of Jets in Third Highest Pt Jet",21,-6,15);
 
+    h28 = new TH1F("h28", "Truth Level W Pt",100,0,500);
+
 	wk()->addOutput (h0);
     wk()->addOutput (h1);
     wk()->addOutput (h2);
@@ -125,6 +127,7 @@ EL::StatusCode MyxAODAnalysis :: histInitialize ()
     wk()->addOutput (h25);
     wk()->addOutput (h26);
     wk()->addOutput (h27);
+    wk()->addOutput (h28);
 
 	return EL::StatusCode::SUCCESS;
 }
@@ -163,8 +166,8 @@ EL::StatusCode MyxAODAnalysis :: initialize ()
     xAOD::TEvent* event = wk()->xaodEvent();
     
     total_eventCounter = 0;
-    background = fopen("./280_500background.txt", "a");
-    // signal = fopen("./280_500signal.txt", "a");
+    //background = fopen("./280_500background.txt", "a");
+    signal = fopen("./280_500signal.txt", "a");
     return EL::StatusCode::SUCCESS;
 }
 
@@ -178,6 +181,30 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     const xAOD::EventInfo* eventInfo = 0;
     ANA_CHECK(event->retrieve(eventInfo, "EventInfo"));
 
+	// Find truth level W boson
+    const xAOD::TruthParticleContainer* truthParticle = 0;
+    int pid;
+    ANA_CHECK( event->retrieve(truthParticle, "TruthParticles") );
+    xAOD::TruthParticleContainer::const_iterator truthParticle_itr = truthParticle->begin();
+    xAOD::TruthParticleContainer::const_iterator truthParticle_end = truthParticle->end();
+    float w_pt;
+    int w_counter = 0;
+
+    for(;truthParticle_itr!=truthParticle_end;++truthParticle_itr){
+    	pid = (*truthParticle_itr)->pdgId();
+    	if(pid == 24 || pid == -24){
+    		w_pt =  (*truthParticle_itr)->p4().Pt();
+    		w_counter++;
+            break;
+    	}
+    }
+
+    if(w_counter == 0){
+    	printf("No W found\n");
+    	exit(0);
+    }
+
+    h28->Fill(w_pt/1000);
 
     // Find highest Pt photon
     float photon_highest_pt = 0;
@@ -343,15 +370,14 @@ EL::StatusCode MyxAODAnalysis :: execute ()
         }
     }
 
-    if(pt_photon.Pt()/1000>250 && pt_photon.Eta()<1.37 && pt_1>200 && eta_1<2){
+    if(pt_photon.Pt()/1000>250 && TMath::Abs(pt_photon.Eta())<1.37 && pt_1>200 && TMath::Abs(eta_1)<2){
     	// baseline cuts
 
-    fprintf(background,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+    fprintf(background,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
         pt_1,eta_1,phi_1,m_1,D2_1,subjets_1,
         pt_2,eta_2,phi_2,m_2,D2_2,subjets_2,
         pt_3,eta_3,phi_3,m_3,D2_3,subjets_3,
-        pt_photon.Pt()/1000,pt_photon.Eta(),pt_photon.Phi(),
-        ECF2_1,ECF3_1,ECF2_2,ECF3_2,ECF2_3,ECF3_3,eventInfo->mcEventWeight()
+        pt_photon.Pt()/1000,pt_photon.Eta(),pt_photon.Phi()
         );
     // fprintf(background,"%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f\n",
     //     (*aux_jets_itr_1)->p4().Pt()/1000,(*aux_jets_itr_1)->p4().Eta(),(*aux_jets_itr_1)->p4().Phi(),(*aux_jets_itr_1)->p4().M(),D2_1,(*aux_jets_itr_1)->auxdata<int>("NTrimSubjets"),
