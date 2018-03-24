@@ -100,7 +100,7 @@ def confusion_matrix(prediction, sample_x, sample_y, threshold):
 
 	return true_signal, false_signal, false_background, true_background, filtered_mass
 
-def train_neural_network(x, layer_sizes, lr_model):
+def train_neural_network(x, layer_sizes, lr_model, all_nodes):
 
 	global_step=tf.Variable(0,trainable=False)
 
@@ -130,10 +130,14 @@ def train_neural_network(x, layer_sizes, lr_model):
 	with tf.Session(config = config) as sess:
 		sess.run(tf.global_variables_initializer())
 
+		saver = tf.train.Saver()
+
 		epoch = 0
 		
 		while (True):
-			if (epoch+1>max_epochs):
+			if (epoch+1>max_epochs and len(layer_sizes)!=10):
+				break
+			if (epoch+1>100 and len(layer_sizes)==10):
 				break
 			epoch_loss = 0
 			i=0
@@ -192,9 +196,16 @@ def train_neural_network(x, layer_sizes, lr_model):
 			threshold_plot[1][i] = true_signal/math.sqrt(false_signal+1)
 			i += 1
 			
-	print("Signal Efficiency: ", roc[0])
-	print("Background Rejection: ", roc[1])
-	auc = np.trapz(roc[1],roc[0])
+		print("Signal Efficiency: ", roc[0])
+		print("Background Rejection: ", roc[1])
+		auc = np.trapz(roc[1],roc[0])
+
+		max_curr_auc = 0
+		for node in all_nodes:
+			if node.auc > max_curr_auc:
+				max_curr_auc = node.auc
+		if -auc > max_curr_auc:
+			saver.save(sess, './output_data/%d-layer_%s_data_%s_lr' % (int(sys.argv[3]),sys.argv[1],sys.argv[4]))
 
 	return roc, -auc, threshold_plot, filtered_mass_ret, epoch_losses
 
@@ -218,7 +229,7 @@ def structure_test():
 			n_nodes.append(random.randint(lower,upper))
 		print()
 		print("Structure",tries+1,": ", n_nodes, sys.argv[4], " learning rate")
-		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes, sys.argv[4])
+		roc, auc, threshold_plot, filtered_mass, epoch_losses = train_neural_network(x,n_nodes, sys.argv[4], all_nodes)
 		node = MyStruct(roc = roc, auc = auc, threshold_plot = threshold_plot, filtered_mass = filtered_mass, epoch_losses = epoch_losses, name = "[%s]" % n_nodes)
 		all_nodes.append(node)
 	return all_nodes
