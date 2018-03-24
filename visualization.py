@@ -10,6 +10,7 @@ import os
 import glob
 
 MyStruct = namedtuple("MyStruct", "roc auc threshold_plot filtered_mass epoch_losses name")
+table_printed = np.zeros((15,10))
 
 def plot_graph(data_sample, num_layers, lr_model):
 
@@ -17,9 +18,9 @@ def plot_graph(data_sample, num_layers, lr_model):
 		raise Exception('Illegal data_sample input!')
 
 	with open ('./input data/%s_test_x' % data_sample, 'rb') as fp:
-	    test_x = pickle.load(fp)
+		test_x = pickle.load(fp)
 
-	with open('./output data/%d-layer %s data %s_lr' % (num_layers,data_sample, lr_model), 'rb') as fp:
+	with open('./output_data/%d-layer %s data %s_lr' % (num_layers,data_sample, lr_model), 'rb') as fp:
 		all_nodes = pickle.load(fp)
 
 	with open('./input data/max_min_features', 'rb') as fp:
@@ -31,6 +32,8 @@ def plot_graph(data_sample, num_layers, lr_model):
 
 	n = len(all_nodes)
 
+	highest_AUC = 0
+
 	# bubble sort all nodes
 	for i in range(n):
 		for j in range(0,n-i-1):
@@ -41,6 +44,8 @@ def plot_graph(data_sample, num_layers, lr_model):
 	for i in range(n-1,0,-int(n/5)):
 		roc = all_nodes[i].roc
 		auc = all_nodes[i].auc
+		if i == n-1:
+			highest_AUC = auc
 		roc_name = all_nodes[i].name
 		plt.plot(roc[0],roc[1],label="%s, AUC = %f" % (roc_name,auc))
 	plt.xlabel("Signal Efficiency")
@@ -59,7 +64,7 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
 	plt.legend()
 	plt.title("%d-layer Probability Threshold %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer_Probability_Threshold %s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN results visualizations/%s data/%d-layer_Probability_Threshold_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(2)
 
 	masses = []
@@ -107,22 +112,56 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.savefig("./NN results visualizations/%s data/%d-layer_Loss_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(5)
 
+	f = open("./NN results visualizations/%d-layer %s_data summary" %(num_layers, data_sample),"a")
+	# f.write("%d-layer %s data %s_lr\n" % (num_layers, data_sample, lr_model))
+	# f.write("Highest AUC, Highest signal over background ratio and Number of Epochs till Convergence\n")
+	length = len(all_nodes[n-1].epoch_losses)
+	f.write("%s & %.3f & %3.1f & %3.1f & %d" % (lr_model, auc, max_ratio, all_nodes[n-1].epoch_losses[length-1],length))
+	f.write(r'\\')
+	f.write("\n \hline\n")
+	f.close()
+	table_printed[int(num_layers)][data_sample_index]+=1
 
-# plot_graph(sys.argv[1],int(sys.argv[2]))
 if __name__ == '__main__':
 
 	path = './output_data'
 
 	for filename in glob.glob(os.path.join(path, '*lr')):
-	    # do your stuff
-	    # print("filename = ", filename)
-	    filename = re.split("/",filename)[2]
-	    num_layers = re.split("-",filename)[0]
-	    # print("num_layers = ", num_layers)
-	    data_sample = re.split(" ",filename)[1]
-	    # print("data_sample = ", data_sample)
-	    lr_model = re.split("_",re.split(" ",filename)[3])[0]
-	    # print("lr_model = ", lr_model)
-	    plot_graph(data_sample, int(num_layers),lr_model)
+		# do your stuff
+		# print("filename = ", filename)
+		filename = re.split("/",filename)[2]
+		num_layers = re.split("-",filename)[0]
+		# print("num_layers = ", num_layers)
+		data_sample = re.split(" ",filename)[1]
+		# print("data_sample = ", data_sample)
+		lr_model = re.split("_",re.split(" ",filename)[3])[0]
+		# print("lr_model = ", lr_model)
+		data_sample_index = np.where(data_sample == "all", 0, np.where(data_sample == "no_D2", 1, 2))
+
+		if table_printed[int(num_layers)][data_sample_index] == 0:
+			f = open("./NN results visualizations/%d-layer %s_data summary" %(int(num_layers), data_sample),"a")
+			f.write(r'\begin{table}[H]')
+			f.write("\n")
+			f.write("\centering")
+			f.write("\n")
+			f.write(r'\begin{tabular}{|p{1.4cm}|p{1.2cm}|p{2.2cm}|p{1.5cm}|p{1.2cm}|}')
+			f.write("\n")
+			f.write("\hline")
+			f.write("\n")
+			f.write(r'Learning Rate& Highest AUC & $\frac{Signal}{\sqrt{Background+1}}$ & Converged Loss & Number of Epochs\\ [0.5ex]')
+			f.write("\n")
+			f.write(r'\hline\hline')
+			f.write("\n")
+			f.close()
+		plot_graph(data_sample, int(num_layers),lr_model)
+		if table_printed[int(num_layers)][data_sample_index] == 5:
+			f = open("./NN results visualizations/%d-layer %s_data summary" %(int(num_layers), data_sample),"a")
+			f.write(r'\end{tabular}')
+			f.write("\n")
+			f.write("\caption{%d-layer Neural Net, %s features}\n"%(int(num_layers), data_sample))
+			f.write("\label{%d-layer_%s_features_table}\n"%(int(num_layers), data_sample))
+			f.write(r"\end{table}")
+			f.close()
+
 
 
