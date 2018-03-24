@@ -12,7 +12,7 @@ void save(){
     
     int i=0;
     
-    for(i=0;i<=27;i++){
+    for(i=0;i<=28;i++){
         char name[50];
         sprintf(name,"h%d",i);
         printf("Histogram : %s\n",name);

@@ -204,8 +204,6 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     	exit(0);
     }
 
-    h28->Fill(w_pt/1000);
-
     // Find highest Pt photon
     float photon_highest_pt = 0;
     const xAOD::PhotonContainer* photons = 0;
@@ -370,7 +368,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
         }
     }
 
-    if(pt_photon.Pt()/1000>250 && TMath::Abs(pt_photon.Eta())<1.37 && pt_1>200 && TMath::Abs(eta_1)<2 && w_pt/1000>150){
+    if(pt_photon.Pt()/1000>250 && TMath::Abs(pt_photon.Eta())<1.37 && pt_1>200 && TMath::Abs(eta_1)<2 && w_pt/1000>200){
     	// baseline cuts
 
     fprintf(signal,"%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
@@ -415,6 +413,7 @@ EL::StatusCode MyxAODAnalysis :: execute ()
     h25->Fill(ECF3_3);
     h26->Fill(D2_3);
     h27->Fill(subjets_3);
+    h28->Fill(w_pt/1000);
 }
 
     if(jet_counter<3 && total_eventCounter<=500){
