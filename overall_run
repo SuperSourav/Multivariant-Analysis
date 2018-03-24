@@ -1,60 +1,90 @@
 # python sciript_name data_sample_name num_structures num_layers lr_model
 
 rm -r ./__pycache__
-rm -r ./NN\ results\ visualizations
+rm -r ./NN_results_visualizations
 rm -r ./input\ data
 rm -r ./output_data
 mkdir ./output_data
 mkdir ./input\ data
-mkdir ./NN\ results\ visualizations
-mkdir ./NN\ results\ visualizations/all\ data
-mkdir ./NN\ results\ visualizations/high_level\ data
-mkdir ./NN\ results\ visualizations/low_level\ data
-mkdir ./NN\ results\ visualizations/no_D2\ data
-mkdir ./NN\ results\ visualizations/no_jet_mass\ data
+mkdir ./NN_results_visualizations
+mkdir ./NN_results_visualizations/all_data
+mkdir ./NN_results_visualizations/high_level_data
+mkdir ./NN_results_visualizations/low_level_data
+mkdir ./NN_results_visualizations/no_D2_data
+mkdir ./NN_results_visualizations/no_jet_mass_data
 
 python3 create_featuresets.py
+
+python3 neural_network.py all 6 2 exp
+python3 neural_network.py all 6 2 triangular
+python3 neural_network.py all 6 2 SGDR
+python3 neural_network.py all 6 2 staircase
+python3 neural_network.py all 6 2 constant
 
 python3 neural_network.py all 6 3 exp
 python3 neural_network.py all 6 3 triangular
 python3 neural_network.py all 6 3 SGDR
 python3 neural_network.py all 6 3 staircase
-python3 neural_network.py all 6 3 0.001
+python3 neural_network.py all 6 3 constant
+
+python3 neural_network.py all 6 4 exp
+python3 neural_network.py all 6 4 triangular
+python3 neural_network.py all 6 4 SGDR
+python3 neural_network.py all 6 4 staircase
+python3 neural_network.py all 6 4 constant
 
 python3 neural_network.py all 6 5 exp
 python3 neural_network.py all 6 5 triangular
 python3 neural_network.py all 6 5 SGDR
 python3 neural_network.py all 6 5 staircase
-python3 neural_network.py all 6 5 0.001
+python3 neural_network.py all 6 5 constant
 
-python3 neural_network.py all 6 10 SGDR
+python3 neural_network.py high_level 6 2 exp
+python3 neural_network.py high_level 6 2 triangular
+python3 neural_network.py high_level 6 2 SGDR
+python3 neural_network.py high_level 6 2 staircase
+python3 neural_network.py high_level 6 2 constant
 
 python3 neural_network.py high_level 6 3 exp
 python3 neural_network.py high_level 6 3 triangular
 python3 neural_network.py high_level 6 3 SGDR
 python3 neural_network.py high_level 6 3 staircase
-python3 neural_network.py high_level 6 3 0.001
+python3 neural_network.py high_level 6 3 constant
+
+python3 neural_network.py high_level 6 4 exp
+python3 neural_network.py high_level 6 4 triangular
+python3 neural_network.py high_level 6 4 SGDR
+python3 neural_network.py high_level 6 4 staircase
+python3 neural_network.py high_level 6 4 constant
 
 python3 neural_network.py high_level 6 5 exp
 python3 neural_network.py high_level 6 5 triangular
 python3 neural_network.py high_level 6 5 SGDR
 python3 neural_network.py high_level 6 5 staircase
-python3 neural_network.py high_level 6 5 0.001
+python3 neural_network.py high_level 6 5 constant
 
-python3 neural_network.py high_level 6 10 SGDR
+python3 neural_network.py no_D2 6 2 exp
+python3 neural_network.py no_D2 6 2 triangular
+python3 neural_network.py no_D2 6 2 SGDR
+python3 neural_network.py no_D2 6 2 staircase
+python3 neural_network.py no_D2 6 2 constant
 
 python3 neural_network.py no_D2 6 3 exp
 python3 neural_network.py no_D2 6 3 triangular
 python3 neural_network.py no_D2 6 3 SGDR
 python3 neural_network.py no_D2 6 3 staircase
-python3 neural_network.py no_D2 6 3 0.001
+python3 neural_network.py no_D2 6 3 constant
+
+python3 neural_network.py no_D2 6 4 exp
+python3 neural_network.py no_D2 6 4 triangular
+python3 neural_network.py no_D2 6 4 SGDR
+python3 neural_network.py no_D2 6 4 staircase
+python3 neural_network.py no_D2 6 4 constant
 
 python3 neural_network.py no_D2 6 5 exp
 python3 neural_network.py no_D2 6 5 triangular
 python3 neural_network.py no_D2 6 5 SGDR
 python3 neural_network.py no_D2 6 5 staircase
-python3 neural_network.py no_D2 6 5 0.001
-
-python3 neural_network.py no_D2 6 10 SGDR
+python3 neural_network.py no_D2 6 5 constant
 
 python3 visualization.py

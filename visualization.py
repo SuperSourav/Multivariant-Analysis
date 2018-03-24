@@ -52,7 +52,7 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel("Background Rejection")
 	plt.legend()
 	plt.title("%d-layer ROC %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer_ROC_%s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN_results_visualizations/%s_data/%d-layer_ROC_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(1)
 
 	plt.figure(2)
@@ -64,7 +64,7 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel(r'$\frac{signal}{\sqrt{background+1}}$')
 	plt.legend()
 	plt.title("%d-layer Probability Threshold %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer_Probability_Threshold_%s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN_results_visualizations/%s_data/%d-layer_Probability_Threshold_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(2)
 
 	masses = []
@@ -93,14 +93,14 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.legend(loc = "upper right")
 	plt.title("Filtered Jet Mass %s data, Threshold = %f, %s_lr" % (data_sample, max_index/divisions,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer_Filtered_Jet_Mass_%s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN_results_visualizations/%s_data/%d-layer_Filtered_Jet_Mass_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(3)
 
 	plt.figure(4)
 	plt.hist(masses, num_bins, facecolor='blue', alpha=0.5, density = 1)
 	plt.xlabel("Mass of Highest Pt Jet [GeV]")
 	plt.title("Unfiltered Jet Mass %s data" % data_sample)
-	plt.savefig("./NN results visualizations/Unfiltered_Jet_Mass_%s" % data_sample)
+	plt.savefig("./NN_results_visualizations/Unfiltered_Jet_Mass_%s" % data_sample)
 	plt.close(4)
 
 	plt.figure(5)
@@ -109,10 +109,10 @@ def plot_graph(data_sample, num_layers, lr_model):
 	plt.ylabel("Loss")
 	plt.legend()
 	plt.title("%d-layer Loss %s data %s_lr" % (num_layers,data_sample,lr_model))
-	plt.savefig("./NN results visualizations/%s data/%d-layer_Loss_%s_lr" % (data_sample,num_layers,lr_model))
+	plt.savefig("./NN_results_visualizations/%s_data/%d-layer_Loss_%s_lr" % (data_sample,num_layers,lr_model))
 	plt.close(5)
 
-	f = open("./NN results visualizations/%d-layer %s_data summary" %(num_layers, data_sample),"a")
+	f = open("./NN_results_visualizations/%d-layer_%s_data_summary" %(num_layers, data_sample),"a")
 	# f.write("%d-layer %s data %s_lr\n" % (num_layers, data_sample, lr_model))
 	# f.write("Highest AUC, Highest signal over background ratio and Number of Epochs till Convergence\n")
 	length = len(all_nodes[n-1].epoch_losses)
@@ -139,7 +139,7 @@ if __name__ == '__main__':
 		data_sample_index = np.where(data_sample == "all", 0, np.where(data_sample == "no_D2", 1, 2))
 
 		if table_printed[int(num_layers)][data_sample_index] == 0:
-			f = open("./NN results visualizations/%d-layer %s_data summary" %(int(num_layers), data_sample),"a")
+			f = open("./NN_results_visualizations/%d-layer_%s_data_summary" %(int(num_layers), data_sample),"a")
 			f.write(r'\begin{table}[H]')
 			f.write("\n")
 			f.write("\centering")
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 			f.close()
 		plot_graph(data_sample, int(num_layers),lr_model)
 		if table_printed[int(num_layers)][data_sample_index] == 5:
-			f = open("./NN results visualizations/%d-layer %s_data summary" %(int(num_layers), data_sample),"a")
+			f = open("./NN_results_visualizations/%d-layer_%s_data_summary" %(int(num_layers), data_sample),"a")
 			f.write(r'\end{tabular}')
 			f.write("\n")
 			f.write("\caption{%d-layer Neural Net, %s features}\n"%(int(num_layers), data_sample))
